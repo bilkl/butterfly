@@ -1,0 +1,15 @@
+# Un losange de dépendances : b et c dépendent de a, d dépend de b et c.
+# L'observateur ne voit jamais d'état intermédiaire (b à jour, c pas encore).
+soit a = 1;
+lie b = a + 1;
+lie c = a * 10;
+lie d = b + c;
+
+quand d {
+    affiche "d vaut maintenant", d;
+}
+
+affiche d;
+a = 2;
+a = 2;
+a = 5;

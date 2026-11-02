@@ -1,0 +1,31 @@
+# Budget mensuel : des dépenses qui changent et une alerte sur le reste.
+soit salaire = 2000;
+soit loyer = 800;
+soit courses = 300;
+soit loisirs = 150;
+
+lie depenses = loyer + courses + loisirs;
+lie reste = salaire - depenses;
+lie taux = depenses * 100 / salaire;
+
+quand reste {
+    si reste < 0 {
+        affiche "déficit de", abs(reste);
+    } sinon si reste < 200 {
+        affiche "juste, il reste", reste;
+    } sinon {
+        affiche "confortable, il reste", reste;
+    }
+}
+
+affiche "départ :", depenses, reste, taux;
+courses = courses + 400;
+loisirs = 0;
+loisirs = 0;
+loyer = loyer + 600;
+salaire = salaire + 150;
+
+pour mois dans 1..4 {
+    affiche "mois", mois, ":", reste * mois;
+}
+affiche "taux final :", taux;

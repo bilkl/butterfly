@@ -1,0 +1,6 @@
+# Expressions, priorités et fonctions prédéfinies.
+affiche "bonjour";
+affiche 2 + 3 * 4, (2 + 3) * 4;
+affiche 17 / 5, 17 % 5, -17 / 5, -17 % 5;
+affiche 1 < 2, 2 == 3, non (1 < 2) ou 5 >= 5 et 2 < 3;
+affiche min(4, 9), max(4, 9), abs(-7);

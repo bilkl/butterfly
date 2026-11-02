@@ -1,0 +1,24 @@
+# Une boucle alimente des cellules ; un observateur réagit au franchissement d'un seuil.
+soit somme = 0;
+lie moyenne = somme / 4;
+lie grand = somme > 5;
+
+quand grand {
+    affiche "seuil dépassé";
+}
+
+pour i dans 1..5 {
+    soit carre = i * i;
+    somme = somme + i;
+    si i % 2 == 0 {
+        affiche "pair", i, carre, moyenne;
+    } sinon {
+        affiche "impair", i, carre, moyenne;
+    }
+}
+
+pour j dans 3..3 {
+    affiche "jamais";
+}
+
+affiche somme, moyenne, grand;

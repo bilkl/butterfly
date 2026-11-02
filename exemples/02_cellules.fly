@@ -1,0 +1,9 @@
+# Une cellule dérivée (lie) suit ses sources (soit).
+soit prix = 20;
+soit quantite = 3;
+lie total = prix * quantite;
+affiche "total :", total;
+quantite = 5;
+affiche "total :", total;
+prix = prix + 5;
+affiche "total :", total;
