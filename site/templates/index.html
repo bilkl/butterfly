@@ -1,0 +1,106 @@
+<section class="hero">
+  <div class="hero-texte">
+    <h1>Changez une valeur. Le reste suit.</h1>
+    <p class="chapeau">
+      Butterfly est un langage où une cellule peut toujours valoir une formule,
+      comme dans un tableur. Quand une source change, tout ce qui en dépend se
+      met à jour tout seul, une seule fois et dans le bon ordre.
+    </p>
+    <pre class="code hero-code"><code>@@PROGRAMME_HERO@@</code></pre>
+    <p class="actions">
+      <a class="bouton" href="playground.html">Essayer dans le navigateur</a>
+      <a class="bouton secondaire" href="langage.html">Découvrir le langage</a>
+    </p>
+  </div>
+
+  <div class="demo" id="demo" aria-label="Démonstration interactive du programme ci-contre">
+    <svg class="graphe" viewBox="0 0 460 250" role="img" aria-label="Quatre cellules : a alimente b et c, qui alimentent d">
+      <g class="liens" fill="none" stroke-width="2.5">
+        <path id="lien-ab" d="M140 112 C 170 112, 170 50, 200 50"/>
+        <path id="lien-ac" d="M140 138 C 170 138, 170 200, 200 200"/>
+        <path id="lien-bd" d="M330 50 C 355 50, 355 112, 380 112"/>
+        <path id="lien-cd" d="M330 200 C 355 200, 355 138, 380 138"/>
+      </g>
+      <g class="cellule src" id="cell-a" transform="translate(20 100)">
+        <rect width="120" height="50" rx="10"/>
+        <text class="nom" x="14" y="21">soit a</text>
+        <text class="val" x="14" y="41" id="val-a">1</text>
+      </g>
+      <g class="cellule der" id="cell-b" transform="translate(200 25)">
+        <rect width="130" height="50" rx="10"/>
+        <text class="nom" x="12" y="21">lie b = a + 1</text>
+        <text class="val" x="12" y="41" id="val-b">2</text>
+      </g>
+      <g class="cellule der" id="cell-c" transform="translate(200 175)">
+        <rect width="130" height="50" rx="10"/>
+        <text class="nom" x="12" y="21">lie c = a * 10</text>
+        <text class="val" x="12" y="41" id="val-c">10</text>
+      </g>
+      <g class="cellule der" id="cell-d" transform="translate(380 100)">
+        <rect width="64" height="50" rx="10"/>
+        <text class="nom" x="10" y="21">lie d</text>
+        <text class="val" x="10" y="41" id="val-d">12</text>
+      </g>
+    </svg>
+    <div class="commande">
+      <span id="etiquette-a">a vaut</span>
+      <button type="button" id="moins" aria-label="Retirer 1 à a">−</button>
+      <input id="entree-a" type="number" value="1" min="-99" max="99" aria-labelledby="etiquette-a">
+      <button type="button" id="plus" aria-label="Ajouter 1 à a">+</button>
+    </div>
+    <ol class="journal" id="journal" aria-live="polite" aria-label="Ce que l'observateur affiche"></ol>
+  </div>
+</section>
+
+<section class="idees">
+  <h2>Trois mots à retenir</h2>
+  <div class="idees-grille">
+    <div class="idee src">
+      <h3><code>soit</code>, une source</h3>
+      <p>Une cellule qu'on peut modifier quand on veut.</p>
+      <pre class="code"><code><span class="src">soit</span> prix = 20;
+prix = 25;</code></pre>
+    </div>
+    <div class="idee der">
+      <h3><code>lie</code>, une dérivée</h3>
+      <p>Une cellule qui vaut toujours sa formule. On ne lui affecte jamais de valeur.</p>
+      <pre class="code"><code><span class="der">lie</span> total = prix * 3;</code></pre>
+    </div>
+    <div class="idee obs">
+      <h3><code>quand</code>, un observateur</h3>
+      <p>Un bloc exécuté chaque fois que la valeur d'une cellule change.</p>
+      <pre class="code"><code><span class="obs">quand</span> total {
+    <span class="kw">affiche</span> total;
+}</code></pre>
+    </div>
+  </div>
+</section>
+
+<section class="exemple-long">
+  <div class="exemple-texte">
+    <h2>Un petit budget</h2>
+    <p>
+      Les dépenses, le reste et le taux sont des cellules dérivées. Chaque fois
+      qu'une source change, l'observateur sur <code>reste</code> réagit, sans
+      qu'on écrive une seule ligne de recalcul. La sortie ci-contre est celle du
+      vrai compilateur.
+    </p>
+  </div>
+  <div class="essai">
+    <pre class="code"><code>@@PROGRAMME_BUDGET@@</code></pre>
+    <pre class="code sortie"><code>@@SORTIE_BUDGET@@</code></pre>
+    @@LIEN_BUDGET@@
+  </div>
+</section>
+
+<section class="suite">
+  <h2>Pour aller plus loin</h2>
+  <ul class="suite-liste">
+    <li><a href="guide.html">Le guide d'utilisation</a> : installer Butterfly, lancer un programme, utiliser la ligne de commande et le REPL.</li>
+    <li><a href="reference.html">La référence</a> : lexique, grammaire, priorités des opérateurs et sémantique.</li>
+    <li><a href="mcp.html">Le serveur MCP</a> : une IA qui ne connaît pas Butterfly l'apprend, l'écrit et l'exécute, uniquement grâce au serveur.</li>
+    <li><a href="compilateur.html">Sous le capot</a> : le lexer, le parser, l'analyse et la génération de Python, étape par étape.</li>
+  </ul>
+</section>
+
+<script src="static/demo.js"></script>

@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>@@TITRE@@</title>
+  <meta name="description" content="@@DESCRIPTION@@">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="static/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=JetBrains+Mono:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap">
+  <link rel="stylesheet" href="static/style.css">
+  <script>
+    try {
+      var theme = localStorage.getItem("theme");
+      if (theme === "light" || theme === "dark") document.documentElement.dataset.theme = theme;
+    } catch (e) {}
+  </script>
+</head>
+<body class="@@CLASSE@@">
+  <a class="skip" href="#contenu">Aller au contenu</a>
+  <header class="bar">
+    <a class="brand" href="index.html" aria-label="Butterfly, accueil">
+      <img src="static/favicon.svg" alt="" width="30" height="30">
+      <span>Butterfly</span>
+    </a>
+    <nav class="nav" aria-label="Pages du site">
+@@NAV@@
+    </nav>
+    <button class="theme" type="button" aria-label="Changer de thème" title="Changer de thème">
+      <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z" fill="currentColor"/></svg>
+    </button>
+  </header>
+  <main id="contenu">
+@@CORPS@@
+  </main>
+  <footer class="pied">
+    <p>Butterfly, un langage réactif transpilé en Python. Projet du cours Python avancé.</p>
+    <p><a href="@@DEPOT@@">Code source sur GitHub</a></p>
+  </footer>
+  <script src="static/app.js"></script>
+</body>
+</html>

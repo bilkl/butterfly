@@ -55,3 +55,5 @@ select = ["E", "F", "I", "UP", "B", "SIM"]
 [tool.ruff.lint.per-file-ignores]
 # Les tests contiennent des programmes Butterfly écrits en texte : lignes longues permises.
 "tests/*" = ["E501"]
+# Le générateur du site contient des phrases françaises en littéraux.
+"site/build.py" = ["E501"]

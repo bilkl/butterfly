@@ -21,6 +21,8 @@ prix = prix + 5;                 # affiche : nouveau total : 125
 - `lie` crée une cellule dérivée, toujours égale à sa formule.
 - `quand` crée un observateur, exécuté quand la valeur d'une cellule change.
 
+Le site (guide, référence, exemples et bac à sable dans le navigateur) : **https://bilkl.github.io/butterfly/**
+
 La spécification complète est dans [`specification.md`](specification.md).
 
 ## Installation
@@ -28,8 +30,8 @@ La spécification complète est dans [`specification.md`](specification.md).
 Il faut Python 3.12 ou plus et [uv](https://docs.astral.sh/uv/).
 
 ```bash
-git clone https://github.com/bilkl/butterfly-lang.git butterfly-lang
-cd butterfly-lang
+git clone https://github.com/bilkl/butterfly.git
+cd butterfly
 uv sync
 ```
 
@@ -94,7 +96,7 @@ serveur_butterfly/    le serveur MCP et son bac à sable
 exemples/             cinq programmes .fly et leur sortie attendue (.attendu)
 specification.md      la spécification du langage
 tests/                les tests du langage et du serveur
-site/                 le site web (à compléter)
+site/                 le site web (build.py génère les pages depuis le Markdown)
 ```
 
 La chaîne de compilation est écrite à la main :
