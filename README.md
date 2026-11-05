@@ -1,53 +1,53 @@
 # Butterfly
 
-Un langage de programmation **réactif**, transpilé en Python, avec son serveur MCP.
+A **reactive** programming language, transpiled to Python, with its MCP server.
 
-Dans Butterfly, on change une seule valeur et tout ce qui en dépend se met à jour tout seul : c'est l'effet papillon.
+In Butterfly, you change a single value and everything that depends on it updates by itself: that is the butterfly effect.
 
 ```
 soit prix = 20;
 soit quantite = 3;
-lie total = prix * quantite;     # total vaut TOUJOURS prix * quantite
+lie total = prix * quantite;     # total is ALWAYS prix * quantite
 
-quand total {                    # s'exécute chaque fois que total change
+quand total {                    # runs every time total changes
     affiche "nouveau total :", total;
 }
 
-quantite = 5;                    # affiche : nouveau total : 100
-prix = prix + 5;                 # affiche : nouveau total : 125
+quantite = 5;                    # prints: nouveau total : 100
+prix = prix + 5;                 # prints: nouveau total : 125
 ```
 
-- `soit` crée une cellule source, que l'on peut modifier.
-- `lie` crée une cellule dérivée, toujours égale à sa formule.
-- `quand` crée un observateur, exécuté quand la valeur d'une cellule change.
+- `soit` ("let") creates a source cell, which can be modified.
+- `lie` ("bind") creates a derived cell, always equal to its formula.
+- `quand` ("when") creates an observer, run when the value of a cell changes.
 
-Le site (guide, référence, exemples et bac à sable dans le navigateur) : **https://bilkl.github.io/butterfly/**
+The website (guide, reference, examples and an in-browser sandbox): **https://xbkh.github.io/butterfly/**
 
-La spécification complète est dans [`specification.md`](specification.md).
+The full specification is in [`specification.md`](specification.md).
 
 ## Installation
 
-Il faut Python 3.12 ou plus et [uv](https://docs.astral.sh/uv/).
+You need Python 3.12 or later and [uv](https://docs.astral.sh/uv/).
 
 ```bash
-git clone https://github.com/bilkl/butterfly.git
+git clone https://github.com/xbkh/butterfly.git
 cd butterfly
 uv sync
 ```
 
-## Utilisation
+## Usage
 
 ```bash
-uv run python -m butterfly run exemples/02_cellules.fly       # exécuter
-uv run python -m butterfly check programme.fly                # vérifier sans exécuter
-uv run python -m butterfly transpile programme.fly            # voir le Python généré
-uv run python -m butterfly format programme.fly               # mise en forme canonique
-uv run python -m butterfly tokens programme.fly               # les tokens
-uv run python -m butterfly ast programme.fly                  # l'arbre syntaxique
-uv run python -m butterfly repl                               # session interactive
+uv run python -m butterfly run exemples/02_cellules.fly       # run
+uv run python -m butterfly check programme.fly                # check without running
+uv run python -m butterfly transpile programme.fly            # see the generated Python
+uv run python -m butterfly format programme.fly               # canonical formatting
+uv run python -m butterfly tokens programme.fly               # the tokens
+uv run python -m butterfly ast programme.fly                  # the syntax tree
+uv run python -m butterfly repl                               # interactive session
 ```
 
-Les erreurs sont toutes signalées d'un coup, avec la ligne fautive soulignée :
+All errors are reported at once, with the faulty line underlined:
 
 ```
 Erreur sémantique (ligne 3, colonne 1) : 'b' est une cellule dérivée (lie), on ne peut pas lui affecter de valeur
@@ -55,52 +55,54 @@ Erreur sémantique (ligne 3, colonne 1) : 'b' est une cellule dérivée (lie), o
     | ^
 ```
 
-## Serveur MCP
+(The language's error messages are in French. Translation: "Semantic error (line 3, column 1): 'b' is a derived cell (lie), a value cannot be assigned to it".)
 
-Le serveur permet à une IA qui ne connaît pas Butterfly de l'apprendre seule : lire la spécification et les exemples, vérifier, corriger, exécuter.
+## MCP server
 
-| Outil | Rôle |
+The server lets an AI that does not know Butterfly learn it on its own: read the specification and the examples, check, fix, run.
+
+| Tool | Role |
 |---|---|
-| `tokenize` | découpe un programme en tokens |
-| `parse` | renvoie l'arbre syntaxique en JSON |
-| `check` | vérifie sans exécuter, toutes les erreurs d'un coup |
-| `transpile` | renvoie le Python généré |
-| `format` | présentation canonique |
-| `run` | exécute dans un processus borné (délai, sortie, mémoire) |
+| `tokenize` | splits a program into tokens |
+| `parse` | returns the syntax tree as JSON |
+| `check` | checks without running, all errors at once |
+| `transpile` | returns the generated Python |
+| `format` | canonical layout |
+| `run` | runs in a bounded process (timeout, output, memory) |
 
-Il expose aussi les resources `butterfly://specification` et `butterfly://exemples`, et les prompts `ecrire_programme` et `corriger_programme`.
+It also exposes the resources `butterfly://specification` and `butterfly://exemples`, and the prompts `ecrire_programme` and `corriger_programme`.
 
-Pour le brancher sur Claude Code (remplacer le chemin) :
+To plug it into Claude Code (replace the path):
 
 ```bash
-claude mcp add butterfly -- uv --directory /chemin/absolu/vers/butterfly run python -m serveur_butterfly
+claude mcp add butterfly -- uv --directory /absolute/path/to/butterfly run python -m serveur_butterfly
 ```
 
-Un exemple de configuration est dans [`mcp.exemple.json`](mcp.exemple.json).
+An example configuration is in [`mcp.exemple.json`](mcp.exemple.json).
 
-## Tests et qualité
+## Tests and quality
 
 ```bash
 uv run pytest            # 365 tests
-uv run mypy butterfly serveur_butterfly tests   # typage strict
+uv run mypy butterfly serveur_butterfly tests   # strict typing
 uv run ruff check .      # style
 ```
 
-La spécification est exécutable : un test lit son tableau d'erreurs et vérifie que chaque programme fautif produit exactement le message annoncé.
+The specification is executable: a test reads its table of errors and checks that each faulty program produces exactly the announced message.
 
-## Organisation
-
-```
-butterfly/            le compilateur : lexer, parser, sémantique, générateur, CLI, REPL
-serveur_butterfly/    le serveur MCP et son bac à sable
-exemples/             cinq programmes .fly et leur sortie attendue (.attendu)
-specification.md      la spécification du langage
-tests/                les tests du langage et du serveur
-site/                 le site web (build.py génère les pages depuis le Markdown)
-```
-
-La chaîne de compilation est écrite à la main :
+## Layout
 
 ```
-texte → lexer → tokens → parser → arbre → analyse → arbre vérifié → générateur → Python
+butterfly/            the compiler: lexer, parser, semantics, generator, CLI, REPL
+serveur_butterfly/    the MCP server and its sandbox
+exemples/             five .fly programs and their expected output (.attendu)
+specification.md      the language specification
+tests/                the language and server tests
+site/                 the website (build.py generates the pages from Markdown)
+```
+
+The compilation chain is written by hand:
+
+```
+text → lexer → tokens → parser → tree → analysis → checked tree → generator → Python
 ```
