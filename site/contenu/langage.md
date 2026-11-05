@@ -1,10 +1,12 @@
-# Le langage en dix minutes
+# The language in ten minutes
 
-Butterfly est un langage **réactif**. À côté des variables ordinaires, on y déclare des cellules dont la valeur est toujours égale à une formule, comme dans un tableur. Cette page présente le langage pas à pas. Chaque programme est exécuté à la construction du site : ce que vous lisez comme sortie est la vraie sortie.
+Butterfly is a **reactive** language. Next to ordinary variables, you declare cells whose value is always equal to a formula, as in a spreadsheet. This page introduces the language step by step. Every program is run when the site is built: what you read as output is the real output.
 
-## Une valeur qui en suit une autre
+The keywords (`soit`, `lie`, `quand`, `si`, `pour`, `affiche`…) and the error messages are in French: Butterfly is a French-flavoured language. Each one is translated where it first appears.
 
-`soit` crée une **cellule source** : on peut la modifier quand on veut. `lie` crée une **cellule dérivée** : elle vaut toujours le résultat de sa formule.
+## A value that follows another
+
+`soit` ("let") creates a **source cell**: you can change it whenever you like. `lie` ("bind") creates a **derived cell**: it is always equal to the result of its formula. `affiche` ("show") prints its values separated by a space.
 
 ```fly run
 soit prix = 20;
@@ -17,11 +19,11 @@ prix = prix + 5;
 affiche "total :", total;
 ```
 
-Personne n'a recalculé `total`. Dès qu'une source change, toutes les cellules dérivées qui en dépendent sont mises à jour, une seule fois chacune, et dans le bon ordre. On ne peut pas affecter une valeur à une cellule dérivée : ce serait contradictoire avec sa formule.
+Nobody recomputed `total`. As soon as a source changes, every derived cell that depends on it is updated, exactly once each and in the right order. You cannot assign a value to a derived cell: that would contradict its formula.
 
-## Réagir à un changement
+## Reacting to a change
 
-`quand` déclare un **observateur** : un bloc exécuté chaque fois que la valeur d'une cellule change.
+`quand` ("when") declares an **observer**: a block that runs every time the value of a cell changes.
 
 ```fly run
 soit temperature = 18;
@@ -37,15 +39,15 @@ temperature = 30;
 temperature = 20;
 ```
 
-L'observateur n'a parlé que deux fois, alors que la température a changé quatre fois. Ce qui compte, c'est la valeur de `chaud` : elle ne change que lorsqu'on franchit les 25 degrés, dans un sens ou dans l'autre. Trois règles à retenir :
+The observer spoke only twice, although the temperature changed four times. What matters is the value of `chaud` ("hot"): it changes only when the temperature crosses 25 degrees, in either direction. Three rules to remember:
 
-- un observateur n'est **pas** déclenché quand la cellule est créée ;
-- il n'est déclenché que si la valeur **a vraiment changé** (affecter `a = 2;` quand `a` vaut déjà 2 ne fait rien) ;
-- il peut lire n'importe quelle cellule, mais **pas en modifier** une du niveau supérieur, ce qui évite les boucles infinies.
+- an observer is **not** triggered when the cell is created;
+- it is triggered only if the value **really changed** (assigning `a = 2;` when `a` is already 2 does nothing);
+- it can read any cell, but it **cannot modify** a top-level one, which rules out infinite loops.
 
-## Pas d'état intermédiaire
+## No intermediate state
 
-Quand plusieurs cellules dépendent de la même source, un observateur ne voit jamais un état à moitié mis à jour. Ici, `d` dépend de `b` et de `c`, qui dépendent tous deux de `a` :
+When several cells depend on the same source, an observer never sees a half-updated state. Here `d` depends on `b` and `c`, which both depend on `a`:
 
 ```fly run
 soit a = 1;
@@ -61,11 +63,11 @@ a = 2;
 a = 5;
 ```
 
-Pour `a = 2;`, `d` est recalculée une fois, **après** `b` et `c`. L'observateur reçoit donc 23, jamais 13 (la valeur qu'on obtiendrait avec `b` à jour mais pas encore `c`).
+For `a = 2;`, `d` is recomputed once, **after** `b` and `c`. The observer therefore receives 23, never 13 (the value you would get with `b` up to date but `c` not yet).
 
-## Valeurs et opérateurs
+## Values and operators
 
-Butterfly a trois sortes de valeurs : les **entiers** (de taille illimitée), les **booléens** (`vrai`, `faux`) et les **textes**. Les variables n'ont pas de type déclaré : c'est la valeur qui en porte un, et les erreurs de type sont signalées à l'exécution.
+Butterfly has three kinds of values: **integers** (of unlimited size), **booleans** (`vrai` for true, `faux` for false) and **texts**. Variables have no declared type: the value carries one, and type errors are reported at run time. The logical operators are `et` (and), `ou` (or) and `non` (not).
 
 ```fly run
 affiche 2 + 3 * 4, (2 + 3) * 4;
@@ -75,27 +77,29 @@ affiche "but" + "terfly", "a" < "b";
 affiche 99999999999 * 99999999999;
 ```
 
-`/` est la division entière arrondie vers le bas, et `%` le reste de même signe que le diviseur (comme `//` et `%` de Python). Voici les priorités, du moins prioritaire au plus prioritaire :
+`/` is integer division rounded down, and `%` is the remainder with the same sign as the divisor (like Python's `//` and `%`). Here are the priorities, from lowest to highest:
 
-| Niveau | Opérateurs | Associativité |
+| Level | Operators | Associativity |
 |---|---|---|
-| 1 | `ou` | gauche |
-| 2 | `et` | gauche |
-| 3 | `non` | préfixe |
-| 4 | `==` `!=` `<` `<=` `>` `>=` | aucune |
-| 5 | `+` `-` | gauche |
-| 6 | `*` `/` `%` | gauche |
-| 7 | `-` unaire | préfixe |
+| 1 | `ou` | left |
+| 2 | `et` | left |
+| 3 | `non` | prefix |
+| 4 | `==` `!=` `<` `<=` `>` `>=` | none |
+| 5 | `+` `-` | left |
+| 6 | `*` `/` `%` | left |
+| 7 | unary `-` | prefix |
 
-Les comparaisons **ne s'enchaînent pas** : `1 < 2 < 3` est une erreur, qui dit comment l'écrire.
+Comparisons **do not chain**: `1 < 2 < 3` is an error, and the message says how to write it (the message reads: "comparisons do not chain, use 'et'").
 
 ```fly erreur
 affiche 1 < 2 < 3;
 ```
 
-`et` et `ou` **court-circuitent** : `faux et (1 / 0 == 0)` vaut `faux` sans jamais diviser par zéro. Et `==` compare aussi les types : `vrai == 1` vaut `faux`.
+`et` and `ou` **short-circuit**: `faux et (1 / 0 == 0)` is `faux` without ever dividing by zero. And `==` also compares types: `vrai == 1` is `faux`.
 
-## Conditions et boucles
+## Conditions and loops
+
+`si` is "if", `sinon` is "else", and `pour i dans 1..4` is "for i in 1..4".
 
 ```fly run
 soit note = 14;
@@ -112,11 +116,11 @@ pour i dans 1..4 {
 }
 ```
 
-La borne haute d'un `pour` est **exclue** : `1..4` donne 1, 2, 3. Les bornes sont évaluées une seule fois, avant la boucle. La variable de boucle est en lecture seule.
+The upper bound of a `pour` is **excluded**: `1..4` gives 1, 2, 3. The bounds are evaluated once, before the loop. The loop variable is read-only.
 
-## Blocs et portées
+## Blocks and scopes
 
-Un nom déclaré dans un bloc n'existe plus après lui. Surtout, un nom **ne peut jamais en masquer un autre** : c'est plus strict que Python, et c'est ce qui permet au code Python généré de garder exactement le même sens.
+A name declared in a block no longer exists after it. Above all, a name **can never hide another**: this is stricter than Python, and it is what lets the generated Python code keep exactly the same meaning.
 
 ```fly erreur
 soit a = 1;
@@ -125,17 +129,19 @@ si vrai {
 }
 ```
 
-## Fonctions prédéfinies
+The message says: "'a' is already declared".
 
-Il y en a trois, qui travaillent sur des entiers : `min`, `max` et `abs`.
+## Built-in functions
+
+There are three, and they work on integers: `min`, `max` and `abs`.
 
 ```fly run
 affiche min(4, 9), max(4, 9), abs(-7);
 ```
 
-## Les erreurs
+## Errors
 
-Une erreur donne son genre, sa position, un message qui dit quoi faire, et la ligne fautive soulignée. Butterfly signale **toutes** les erreurs d'un coup plutôt qu'une par une.
+An error gives its kind, its position, a message that says what to do, and the faulty line underlined. Butterfly reports **all** the errors at once rather than one by one.
 
 ```fly erreur
 soit a = ;
@@ -143,11 +149,15 @@ soit b = 2
 affiche c;
 ```
 
-Il y a quatre genres d'erreurs : lexicale (un caractère que le langage ne connaît pas), de syntaxe, sémantique (le programme est bien écrit mais n'a pas de sens) et d'exécution.
+The three messages above read: "expression expected, ';' found", "';' expected at the end of the statement" and "name 'c' not declared".
+
+There are four kinds of errors: lexical (a character the language does not know), syntax, semantic (the program is well written but makes no sense) and runtime.
 
 ```fly erreur
 soit x = 3 @ 2;
 ```
+
+("unexpected character '@'")
 
 ```fly erreur
 soit a = 1;
@@ -155,7 +165,9 @@ lie b = a;
 b = 2;
 ```
 
-Une erreur d'exécution donne la ligne **du programme Butterfly** (pas celle du Python généré), et ce qui a déjà été affiché est conservé :
+("'b' is a derived cell (lie), a value cannot be assigned to it")
+
+A runtime error gives the line **of the Butterfly program** (not the one of the generated Python), and what was already printed is kept:
 
 ```fly run
 affiche "début";
@@ -163,6 +175,8 @@ affiche 1 / 0;
 affiche "fin";
 ```
 
-## Ce que Butterfly ne fait pas
+The error here is "division by zero".
 
-Pas de fonctions définies par l'utilisateur, pas de listes, pas de nombres décimaux, pas d'entrées-sorties (ni fichiers, ni clavier, ni réseau). Un programme ne peut que calculer et afficher. C'est un choix : cela rend le langage petit et, surtout, sûr à exécuter pour une IA (voir la page sur le [serveur MCP](mcp.html)).
+## What Butterfly does not do
+
+No user-defined functions, no lists, no decimal numbers, no input or output (no files, no keyboard, no network). A program can only compute and print. This is a choice: it keeps the language small and, above all, safe for an AI to run (see the page on the [MCP server](mcp.html)).

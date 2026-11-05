@@ -1,4 +1,4 @@
-# Budget mensuel : des dépenses qui changent et une alerte sur le reste.
+# Monthly budget: expenses that change and an alert on what is left.
 soit salaire = 2000;
 soit loyer = 800;
 soit courses = 300;

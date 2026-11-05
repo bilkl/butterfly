@@ -1,20 +1,20 @@
 <section class="hero">
   <div class="hero-texte">
-    <h1>Changez une valeur. Le reste suit.</h1>
+    <h1>Change one value. The rest follows.</h1>
     <p class="chapeau">
-      Butterfly est un langage où une cellule peut toujours valoir une formule,
-      comme dans un tableur. Quand une source change, tout ce qui en dépend se
-      met à jour tout seul, une seule fois et dans le bon ordre.
+      Butterfly is a language where a cell can always be equal to a formula,
+      as in a spreadsheet. When a source changes, everything that depends on it
+      updates by itself, exactly once and in the right order.
     </p>
     <pre class="code hero-code"><code>@@PROGRAMME_HERO@@</code></pre>
     <p class="actions">
-      <a class="bouton" href="playground.html">Essayer dans le navigateur</a>
-      <a class="bouton secondaire" href="langage.html">Découvrir le langage</a>
+      <a class="bouton" href="playground.html">Try it in the browser</a>
+      <a class="bouton secondaire" href="langage.html">Discover the language</a>
     </p>
   </div>
 
-  <div class="demo" id="demo" aria-label="Démonstration interactive du programme ci-contre">
-    <svg class="graphe" viewBox="0 0 460 250" role="img" aria-label="Quatre cellules : a alimente b et c, qui alimentent d">
+  <div class="demo" id="demo" aria-label="Interactive demonstration of the program beside it">
+    <svg class="graphe" viewBox="0 0 460 250" role="img" aria-label="Four cells: a feeds b and c, which feed d">
       <g class="liens" fill="none" stroke-width="2.5">
         <path id="lien-ab" d="M140 112 C 170 112, 170 50, 200 50"/>
         <path id="lien-ac" d="M140 138 C 170 138, 170 200, 200 200"/>
@@ -43,32 +43,32 @@
       </g>
     </svg>
     <div class="commande">
-      <span id="etiquette-a">a vaut</span>
-      <button type="button" id="moins" aria-label="Retirer 1 à a">−</button>
+      <span id="etiquette-a">a is</span>
+      <button type="button" id="moins" aria-label="Subtract 1 from a">−</button>
       <input id="entree-a" type="number" value="1" min="-99" max="99" aria-labelledby="etiquette-a">
-      <button type="button" id="plus" aria-label="Ajouter 1 à a">+</button>
+      <button type="button" id="plus" aria-label="Add 1 to a">+</button>
     </div>
-    <ol class="journal" id="journal" aria-live="polite" aria-label="Ce que l'observateur affiche"></ol>
+    <ol class="journal" id="journal" aria-live="polite" aria-label="What the observer prints"></ol>
   </div>
 </section>
 
 <section class="idees">
-  <h2>Trois mots à retenir</h2>
+  <h2>Three words to remember</h2>
   <div class="idees-grille">
     <div class="idee src">
-      <h3><code>soit</code>, une source</h3>
-      <p>Une cellule qu'on peut modifier quand on veut.</p>
+      <h3><code>soit</code>, a source</h3>
+      <p>A cell you can change whenever you like.</p>
       <pre class="code"><code><span class="src">soit</span> prix = 20;
 prix = 25;</code></pre>
     </div>
     <div class="idee der">
-      <h3><code>lie</code>, une dérivée</h3>
-      <p>Une cellule qui vaut toujours sa formule. On ne lui affecte jamais de valeur.</p>
+      <h3><code>lie</code>, a derived cell</h3>
+      <p>A cell that is always equal to its formula. You never assign it a value.</p>
       <pre class="code"><code><span class="der">lie</span> total = prix * 3;</code></pre>
     </div>
     <div class="idee obs">
-      <h3><code>quand</code>, un observateur</h3>
-      <p>Un bloc exécuté chaque fois que la valeur d'une cellule change.</p>
+      <h3><code>quand</code>, an observer</h3>
+      <p>A block that runs every time the value of a cell changes.</p>
       <pre class="code"><code><span class="obs">quand</span> total {
     <span class="kw">affiche</span> total;
 }</code></pre>
@@ -78,12 +78,12 @@ prix = 25;</code></pre>
 
 <section class="exemple-long">
   <div class="exemple-texte">
-    <h2>Un petit budget</h2>
+    <h2>A small budget</h2>
     <p>
-      Les dépenses, le reste et le taux sont des cellules dérivées. Chaque fois
-      qu'une source change, l'observateur sur <code>reste</code> réagit, sans
-      qu'on écrive une seule ligne de recalcul. La sortie ci-contre est celle du
-      vrai compilateur.
+      The expenses, the remainder and the rate are derived cells. Every time
+      a source changes, the observer on <code>reste</code> ("remainder") reacts,
+      without a single line of recomputation being written. The output beside
+      it is the real compiler's.
     </p>
   </div>
   <div class="essai">
@@ -94,12 +94,12 @@ prix = 25;</code></pre>
 </section>
 
 <section class="suite">
-  <h2>Pour aller plus loin</h2>
+  <h2>Going further</h2>
   <ul class="suite-liste">
-    <li><a href="guide.html">Le guide d'utilisation</a> : installer Butterfly, lancer un programme, utiliser la ligne de commande et le REPL.</li>
-    <li><a href="reference.html">La référence</a> : lexique, grammaire, priorités des opérateurs et sémantique.</li>
-    <li><a href="mcp.html">Le serveur MCP</a> : une IA qui ne connaît pas Butterfly l'apprend, l'écrit et l'exécute, uniquement grâce au serveur.</li>
-    <li><a href="compilateur.html">Sous le capot</a> : le lexer, le parser, l'analyse et la génération de Python, étape par étape.</li>
+    <li><a href="guide.html">The user guide</a>: install Butterfly, run a program, use the command line and the REPL.</li>
+    <li><a href="reference.html">The reference</a>: lexicon, grammar, operator priorities and semantics.</li>
+    <li><a href="mcp.html">The MCP server</a>: an AI that does not know Butterfly learns it, writes it and runs it, thanks to the server alone.</li>
+    <li><a href="compilateur.html">Under the hood</a>: the lexer, the parser, the analysis and the Python generation, step by step.</li>
   </ul>
 </section>
 

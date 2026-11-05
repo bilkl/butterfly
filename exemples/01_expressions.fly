@@ -1,4 +1,4 @@
-# Expressions, priorités et fonctions prédéfinies.
+# Expressions, priorities and built-in functions.
 affiche "bonjour";
 affiche 2 + 3 * 4, (2 + 3) * 4;
 affiche 17 / 5, 17 % 5, -17 / 5, -17 % 5;

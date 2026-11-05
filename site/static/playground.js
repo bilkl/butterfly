@@ -1,5 +1,5 @@
-// Le playground : le vrai compilateur Butterfly, exécuté dans le navigateur
-// par Pyodide (Python compilé en WebAssembly).
+// The playground: the real Butterfly compiler, run in the browser by Pyodide
+// (Python compiled to WebAssembly).
 (function () {
   var editeur = document.getElementById("editeur");
   if (!editeur) return;
@@ -11,10 +11,10 @@
   var python = document.querySelector("#panneau-python code");
   var exemples = JSON.parse(document.getElementById("exemples").textContent);
 
-  // --- Choix d'un exemple, et partage par l'adresse (#code=...) -----------------
+  // --- Picking an example, and sharing through the address (#code=...) ----------
   var vide = document.createElement("option");
   vide.value = "";
-  vide.textContent = "(mon programme)";
+  vide.textContent = "(my program)";
   choix.appendChild(vide);
   exemples.forEach(function (exemple, i) {
     var option = document.createElement("option");
@@ -32,11 +32,11 @@
   if (depart !== null) {
     editeur.value = depart;
   } else {
-    var initial = exemples.length > 2 ? 2 : 0; // le losange
+    var initial = exemples.length > 2 ? 2 : 0; // the diamond
     editeur.value = exemples[initial].source;
     choix.value = String(initial);
   }
-  // Un lien « Essayer ce programme » ouvert dans la page déjà chargée.
+  // A "Try this program" link opened in the already loaded page.
   window.addEventListener("hashchange", function () {
     var code = codeDepuisAdresse();
     if (code !== null) {
@@ -48,7 +48,7 @@
     if (choix.value !== "") editeur.value = exemples[Number(choix.value)].source;
   });
 
-  // --- Onglets ------------------------------------------------------------------
+  // --- Tabs ---------------------------------------------------------------------
   var ongletSortie = document.getElementById("onglet-sortie");
   var ongletPython = document.getElementById("onglet-python");
   var panneauSortie = document.getElementById("panneau-sortie");
@@ -62,7 +62,7 @@
   ongletSortie.addEventListener("click", function () { montrer(true); });
   ongletPython.addEventListener("click", function () { montrer(false); });
 
-  // --- Chargement du compilateur ----------------------------------------------------
+  // --- Loading the compiler -----------------------------------------------------------
   var lancer = null;
   var SCRIPT = [
     "import json",
@@ -84,7 +84,7 @@
   }
 
   if (typeof loadPyodide !== "function") {
-    echec("Impossible de charger Python (Pyodide) : vérifiez la connexion, puis rechargez la page.");
+    echec("Could not load Python (Pyodide): check your connection, then reload the page.");
     return;
   }
 
@@ -97,10 +97,10 @@
           pyodide.runPython(SCRIPT);
           lancer = pyodide.globals.get("lancer");
           executer.disabled = false;
-          statut.textContent = "Prêt.";
+          statut.textContent = "Ready.";
         });
     })
-    .catch(function (erreur) { echec("Le chargement a échoué : " + erreur); });
+    .catch(function (erreur) { echec("Loading failed: " + erreur); });
 
   function exécuter() {
     if (!lancer) return;
@@ -108,7 +108,7 @@
     if (!resultat.ok) {
       sortie.textContent = resultat.erreurs.join("\n");
       python.textContent = "";
-      statut.textContent = resultat.erreurs.length + " erreur(s) dans le programme.";
+      statut.textContent = resultat.erreurs.length + " error(s) in the program.";
       montrer(true);
       return;
     }
@@ -117,9 +117,9 @@
       var avant = texte.replace(/\n$/, "");
       texte = (avant ? avant + "\n" : "") + resultat.erreur;
     }
-    sortie.textContent = texte || "(le programme n'a rien affiché)";
+    sortie.textContent = texte || "(the program printed nothing)";
     python.textContent = resultat.python;
-    statut.textContent = resultat.erreur ? "Erreur d'exécution." : "Exécuté.";
+    statut.textContent = resultat.erreur ? "Runtime error." : "Done.";
     montrer(true);
   }
   executer.addEventListener("click", exécuter);

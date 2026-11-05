@@ -1,17 +1,19 @@
-# Spécification de Butterfly
+# Butterfly specification
 
-> Brouillon de l'étape 1. À relire, à corriger et à faire valider par l'enseignant avant d'écrire la moindre ligne du compilateur.
+> Draft of step 1. To be reviewed, corrected and validated by the instructor before writing a single line of the compiler.
 
-## Identité
+The keywords of the language (`soit`, `lie`, `quand`…) and its error messages are in French. This document is in English; each keyword is translated where it is introduced.
+
+## Identity
 
 | | |
 |---|---|
-| Nom | Butterfly |
+| Name | Butterfly |
 | Extension | `.fly` |
-| Idée | Butterfly est un langage **réactif**, nommé d'après l'effet papillon : changer une seule valeur (un battement d'ailes) peut mettre à jour tout un programme. À côté des variables ordinaires (`soit`), on déclare des **cellules dérivées** (`lie`) dont la valeur est toujours égale à une formule, comme dans un tableur. Quand une source change, tout ce qui en dépend se met à jour tout seul, une seule fois et dans le bon ordre. Des **observateurs** (`quand`) peuvent réagir aux changements. Il s'adresse à qui veut décrire des *relations* plutôt que des étapes de recalcul. |
-| Cible | Python 3.12 |
+| Idea | Butterfly is a **reactive** language, named after the butterfly effect: changing a single value (a flap of wings) can update a whole program. Next to ordinary variables (`soit`, "let"), you declare **derived cells** (`lie`, "bind") whose value is always equal to a formula, as in a spreadsheet. When a source changes, everything that depends on it updates by itself, exactly once and in the right order. **Observers** (`quand`, "when") can react to the changes. It is meant for people who want to describe *relationships* rather than recomputation steps. |
+| Target | Python 3.12 |
 
-## Un programme pour donner le ton
+## A program to set the tone
 
 ```
 soit prix = 20;
@@ -22,35 +24,35 @@ quand total {
     affiche "nouveau total :", total;
 }
 
-quantite = 5;       # affiche : nouveau total : 100
-prix = prix + 5;    # affiche : nouveau total : 125
+quantite = 5;       # prints: nouveau total : 100
+prix = prix + 5;    # prints: nouveau total : 125
 ```
 
-## Lexique
+## Lexicon
 
-- **Blancs et sauts de ligne** : ignorés, sauf pour séparer deux tokens. Les instructions se terminent par `;` : un saut de ligne ne signifie rien, et une expression peut s'étendre sur plusieurs lignes. L'indentation est libre.
-- **Commentaires** : `#` jusqu'à la fin de la ligne. Il n'y a pas de commentaire multiligne.
-- **Nombres** : seulement des **entiers** positifs, suite de chiffres décimaux (`0`, `42`, `007` vaut 7). Les négatifs s'écrivent avec l'opérateur unaire `-`. Pas de décimaux : `1.5` est une erreur lexicale, ce qui évite toute ambiguïté avec `..` (`1..5`).
-- **Textes** : entre guillemets doubles, sur une seule ligne. Échappements acceptés : `\"`, `\\` et `\n`. Tout autre `\x` est une erreur lexicale, de même qu'un texte non fermé en fin de ligne.
-- **Identifiants** : une lettre (accentuée ou non) ou `_`, suivie de lettres, chiffres ou `_`. La casse compte (`Total` et `total` sont deux noms). Un mot-clé collé à d'autres caractères est un identifiant : `soit_x` et `sinon2` sont des identifiants, `soit` est un mot-clé.
-- **Mots-clés** : `soit` `lie` `quand` `si` `sinon` `pour` `dans` `affiche` `vrai` `faux` `et` `ou` `non`
-- **Symboles et opérateurs** : `+` `-` `*` `/` `%` `==` `!=` `<` `<=` `>` `>=` `=` `..` `(` `)` `{` `}` `,` `;`
+- **Whitespace and line breaks**: ignored, except to separate two tokens. Statements end with `;`: a line break means nothing, and an expression may span several lines. Indentation is free.
+- **Comments**: `#` up to the end of the line. There are no multi-line comments.
+- **Numbers**: only positive **integers**, a sequence of decimal digits (`0`, `42`, `007` is 7). Negative numbers are written with the unary operator `-`. No decimals: `1.5` is a lexical error, which avoids any ambiguity with `..` (`1..5`).
+- **Texts**: between double quotes, on a single line. Accepted escapes: `\"`, `\\` and `\n`. Any other `\x` is a lexical error, as is a text left unclosed at the end of the line.
+- **Identifiers**: a letter (accented or not) or `_`, followed by letters, digits or `_`. Case matters (`Total` and `total` are two names). A keyword glued to other characters is an identifier: `soit_x` and `sinon2` are identifiers, `soit` is a keyword.
+- **Keywords**: `soit` (let) `lie` (bind) `quand` (when) `si` (if) `sinon` (else) `pour` (for) `dans` (in) `affiche` (show) `vrai` (true) `faux` (false) `et` (and) `ou` (or) `non` (not)
+- **Symbols and operators**: `+` `-` `*` `/` `%` `==` `!=` `<` `<=` `>` `>=` `=` `..` `(` `)` `{` `}` `,` `;`
 
-Le lexer lit toujours le **plus long** token possible : `<=` est un seul token, `..` aussi, et `==` se distingue de `=`.
+The lexer always reads the **longest** possible token: `<=` is a single token, so is `..`, and `==` is told apart from `=`.
 
-## Grammaire (EBNF)
+## Grammar (EBNF)
 
-Notation : `{ x }` répète zéro fois ou plus, `[ x ]` est facultatif, `|` sépare les choix, les terminaux sont entre guillemets.
+Notation: `{ x }` repeats zero or more times, `[ x ]` is optional, `|` separates choices, terminals are between quotes. The rule names are French, like the keywords (`programme` is the program, `instr_haut` a top-level statement, `liaison` a binding, `observation` an observer, `declaration` a declaration, `affectation` an assignment, `bloc` a block, `disjonction` an "or" expression, `conjonction` an "and" expression, `negation` a negation, `comparaison` a comparison, `somme` a sum, `produit` a product, `unaire` a unary expression, `primaire` a primary expression, `appel` a call).
 
 ```ebnf
 programme     = { instr_haut } FIN ;
 
-(* Au niveau supérieur, on peut tout écrire. *)
+(* At top level, anything may be written. *)
 instr_haut    = instruction | liaison | observation ;
 liaison       = "lie" IDENT "=" expression ";" ;
 observation   = "quand" IDENT bloc ;
 
-(* Dans un bloc, on n'écrit que des instructions : ni "lie", ni "quand". *)
+(* In a block, only statements are written: neither "lie" nor "quand". *)
 instruction   = declaration | affectation | si | pour | affiche ;
 declaration   = "soit" IDENT "=" expression ";" ;
 affectation   = IDENT "=" expression ";" ;
@@ -71,126 +73,128 @@ primaire      = ENTIER | TEXTE | "vrai" | "faux" | appel | IDENT | "(" expressio
 appel         = IDENT "(" [ expression { "," expression } ] ")" ;
 ```
 
-`lie` et `quand` ne sont acceptés qu'au **niveau supérieur** : les écrire dans un bloc est une erreur de syntaxe, avec un message qui le dit.
+`lie` and `quand` are accepted only at **top level**: writing them in a block is a syntax error, with a message that says so.
 
-## Priorité et associativité des opérateurs
+## Operator priority and associativity
 
-Du moins prioritaire au plus prioritaire.
+From lowest to highest priority.
 
-| Niveau | Opérateurs | Associativité |
+| Level | Operators | Associativity |
 |---|---|---|
-| 1 | `ou` | gauche |
-| 2 | `et` | gauche |
-| 3 | `non` (préfixe) | droite |
-| 4 | `==` `!=` `<` `<=` `>` `>=` | **aucune** |
-| 5 | `+` `-` | gauche |
-| 6 | `*` `/` `%` | gauche |
-| 7 | `-` (préfixe) | droite |
+| 1 | `ou` | left |
+| 2 | `et` | left |
+| 3 | `non` (prefix) | right |
+| 4 | `==` `!=` `<` `<=` `>` `>=` | **none** |
+| 5 | `+` `-` | left |
+| 6 | `*` `/` `%` | left |
+| 7 | `-` (prefix) | right |
 
-- Les comparaisons **ne s'enchaînent pas** : `1 < 2 < 3` est une erreur de syntaxe (écrire `1 < 2 et 2 < 3`).
-- `non a == b` se lit `non (a == b)`, car `non` est moins prioritaire que les comparaisons.
-- Le `-` unaire est le plus prioritaire : `-17 / 5` se lit `(-17) / 5`.
+- Comparisons **do not chain**: `1 < 2 < 3` is a syntax error (write `1 < 2 et 2 < 3`).
+- `non a == b` reads as `non (a == b)`, because `non` has a lower priority than comparisons.
+- Unary `-` has the highest priority: `-17 / 5` reads as `(-17) / 5`.
 
-## Sémantique
+## Semantics
 
-### Valeurs et types
+### Values and types
 
-Trois sortes de valeurs : les **entiers** (de taille illimitée), les **booléens** (`vrai`, `faux`) et les **textes**. Les variables n'ont pas de type déclaré : c'est la valeur qui en porte un, et les erreurs de type sont détectées à l'exécution.
+Three kinds of values: **integers** (of unlimited size), **booleans** (`vrai`, `faux`) and **texts**. Variables have no declared type: the value carries one, and type errors are detected at run time.
 
-- `+` additionne deux entiers ou concatène deux textes. `-`, `*`, `/`, `%` ne s'appliquent qu'à des entiers.
-- `/` est la **division entière arrondie vers le bas** et `%` le reste de même signe que le diviseur, comme `//` et `%` de Python : `-17 / 5` vaut `-4` et `-17 % 5` vaut `3`.
-- `<` `<=` `>` `>=` comparent deux entiers ou deux textes (ordre alphabétique des points de code).
-- `==` et `!=` comparent n'importe quelles valeurs ; deux valeurs de types différents sont toujours différentes (`1 == "1"` vaut `faux`).
-- `et`, `ou`, `non` ne s'appliquent qu'à des booléens. `et` et `ou` **court-circuitent** : `faux et (1 / 0 == 0)` vaut `faux`.
+- `+` adds two integers or concatenates two texts. `-`, `*`, `/`, `%` apply to integers only.
+- `/` is **integer division rounded down** and `%` is the remainder with the same sign as the divisor, like Python's `//` and `%`: `-17 / 5` is `-4` and `-17 % 5` is `3`.
+- `<` `<=` `>` `>=` compare two integers or two texts (alphabetical order of code points).
+- `==` and `!=` compare any values; two values of different types are always different (`1 == "1"` is `faux`).
+- `et`, `ou`, `non` apply to booleans only. `et` and `ou` **short-circuit**: `faux et (1 / 0 == 0)` is `faux`.
 
-### Cellules : `soit` et `lie`
+### Cells: `soit` and `lie`
 
-- `soit x = e;` crée une **cellule source** : `e` est évaluée tout de suite, et `x` peut être modifiée plus tard par `x = e2;`.
-- `lie y = e;` crée une **cellule dérivée** : `y` vaut **toujours** la valeur de `e`. On ne peut pas lui affecter de valeur.
-- Un nom doit être **déclaré avant d'être utilisé**. Une formule `lie` ne peut donc s'appuyer que sur des cellules déjà déclarées, ce qui exclut les cycles.
-- Un nom ne peut pas être redéclaré tant qu'un homonyme est visible, **ni masquer** un nom d'un bloc englobant. Les noms des fonctions prédéfinies (`min`, `max`, `abs`) sont réservés.
+- `soit x = e;` creates a **source cell**: `e` is evaluated right away, and `x` can be changed later by `x = e2;`.
+- `lie y = e;` creates a **derived cell**: `y` is **always** equal to the value of `e`. You cannot assign a value to it.
+- A name must be **declared before it is used**. A `lie` formula can therefore rely only on cells already declared, which rules out cycles.
+- A name cannot be redeclared while a namesake is visible, **nor hide** a name of an enclosing block. The names of the built-in functions (`min`, `max`, `abs`) are reserved.
 
 ### Propagation
 
-Quand une source reçoit une valeur (`x = e;`) :
+When a source receives a value (`x = e;`):
 
-1. `e` est évaluée **une seule fois**, avec les valeurs courantes des cellules ;
-2. `x` prend cette valeur ;
-3. toutes les cellules dérivées qui dépendent de `x`, directement ou non, sont recalculées **une seule fois chacune**, dans l'**ordre de leur déclaration** (qui est un ordre topologique valide, puisqu'on déclare avant d'utiliser) ;
-4. enfin, les observateurs concernés s'exécutent (voir ci-dessous).
+1. `e` is evaluated **once**, with the current values of the cells;
+2. `x` takes that value;
+3. all the derived cells that depend on `x`, directly or not, are recomputed **once each**, in the **order of their declaration** (which is a valid topological order, since names are declared before use);
+4. finally, the observers concerned run (see below).
 
-Personne ne voit donc d'état intermédiaire : dans un losange `a → b, c → d`, `d` est recalculée une fois, après `b` et `c`. La propagation a lieu **immédiatement après l'affectation**, y compris dans une boucle ou une condition.
+Nobody therefore sees an intermediate state: in a diamond `a → b, c → d`, `d` is recomputed once, after `b` and `c`. Propagation happens **immediately after the assignment**, including inside a loop or a condition.
 
-### Observateurs : `quand`
+### Observers: `quand`
 
-`quand y { ... }` déclare un bloc qui s'exécute **chaque fois que la valeur de `y` change** : on compare la valeur de `y` avant l'affectation et après la propagation. Une affectation qui ne change aucune valeur (`a = 2;` quand `a` valait déjà 2) ne déclenche rien.
+`quand y { ... }` declares a block that runs **every time the value of `y` changes**: the value of `y` before the assignment is compared with its value after propagation. An assignment that changes no value (`a = 2;` when `a` was already 2) triggers nothing.
 
-- `y` doit être une cellule (`soit` ou `lie`) déclarée **au niveau supérieur**, avant le `quand`.
-- L'observateur n'est **pas** déclenché à la création de la cellule, seulement par un changement ultérieur.
-- Si plusieurs observateurs sont concernés par la même affectation, ils s'exécutent dans l'ordre de leur déclaration, chacun une fois.
-- Un observateur peut lire n'importe quelle cellule, déclarer ses propres variables et utiliser `si`, `pour` et `affiche`. Il ne peut **pas affecter** une cellule du niveau supérieur (cela pourrait boucler indéfiniment) : c'est une erreur sémantique.
+- `y` must be a cell (`soit` or `lie`) declared **at top level**, before the `quand`.
+- The observer is **not** triggered when the cell is created, only by a later change.
+- If several observers are concerned by the same assignment, they run in the order of their declaration, each once.
+- An observer can read any cell, declare its own variables and use `si`, `pour` and `affiche`. It **cannot assign** a top-level cell (that could loop forever): this is a semantic error.
 
-### Blocs et portées
+### Blocks and scopes
 
-Un bloc ouvre une portée : un nom déclaré avec `soit` dans un bloc n'existe plus après son `}`. Le corps d'une boucle est un nouveau bloc **à chaque tour** : `soit carre = i * i;` y est donc redéclaré à chaque tour sans erreur. Le nom d'un bloc frère peut être réutilisé. Un nom utilisé hors de sa portée est une erreur sémantique (« nom non déclaré »).
+A block opens a scope: a name declared with `soit` in a block no longer exists after its `}`. The body of a loop is a new block **at each iteration**: `soit carre = i * i;` ("carre" is "square") is therefore redeclared at each iteration without error. The name of a sibling block can be reused. A name used outside its scope is a semantic error ("name not declared").
 
-> Python n'a pas de portée de bloc. Comme Butterfly interdit de masquer un nom, le Python généré garde le même sens ; l'analyse sémantique doit seulement refuser les usages hors portée.
+> Python has no block scope. Since Butterfly forbids hiding a name, the generated Python keeps the same meaning; the semantic analysis only has to refuse uses outside the scope.
 
-### Structures de contrôle
+### Control structures
 
-- `si c { ... } sinon si c2 { ... } sinon { ... }` : la condition doit être un booléen (erreur d'exécution sinon). Les blocs peuvent être vides.
-- `pour i dans a..b { ... }` : `a` et `b` sont des entiers évalués une fois, avant la boucle. `i` prend les valeurs `a`, `a+1`, …, `b-1` (**borne haute exclue**). Si `a >= b`, le corps ne s'exécute pas. `i` est en lecture seule : lui affecter une valeur est une erreur sémantique.
+- `si c { ... } sinon si c2 { ... } sinon { ... }`: the condition must be a boolean (a runtime error otherwise). Blocks may be empty.
+- `pour i dans a..b { ... }`: `a` and `b` are integers evaluated once, before the loop. `i` takes the values `a`, `a+1`, …, `b-1` (**upper bound excluded**). If `a >= b`, the body does not run. `i` is read-only: assigning it a value is a semantic error.
 
-### Affichage
+### Printing
 
-`affiche e1, e2, ...;` écrit les valeurs séparées par **une espace**, suivies d'un saut de ligne. Un entier s'affiche en décimal, un texte tel quel (sans guillemets), un booléen `vrai` ou `faux`.
+`affiche e1, e2, ...;` writes the values separated by **one space**, followed by a line break. An integer is printed in decimal, a text as is (without quotes), a boolean as `vrai` or `faux`.
 
-### Fonctions prédéfinies
+### Built-in functions
 
-| Appel | Résultat |
+| Call | Result |
 |---|---|
-| `min(a, b)` | le plus petit de deux entiers |
-| `max(a, b)` | le plus grand de deux entiers |
-| `abs(n)` | la valeur absolue d'un entier |
+| `min(a, b)` | the smaller of two integers |
+| `max(a, b)` | the larger of two integers |
+| `abs(n)` | the absolute value of an integer |
 
-Un mauvais nombre d'arguments est une erreur sémantique ; un argument qui n'est pas un entier est une erreur d'exécution. Butterfly n'a pas de fonctions définies par l'utilisateur.
+A wrong number of arguments is a semantic error; an argument that is not an integer is a runtime error. Butterfly has no user-defined functions.
 
-### Erreurs d'exécution
+### Runtime errors
 
-La division ou le modulo par zéro, un opérande du mauvais type, une condition non booléenne, des bornes de `pour` non entières : le programme s'arrête avec un message qui donne la **ligne du programme Butterfly**. Le contenu déjà affiché reste affiché.
+Division or modulo by zero, an operand of the wrong type, a non-boolean condition, non-integer `pour` bounds: the program stops with a message that gives the **line of the Butterfly program**. What was already printed stays printed.
 
-## Programmes d'exemple
+## Example programs
 
-Cinq programmes, dans `projet/exemples/`, avec leur sortie exacte (même nom, extension `.attendu`).
+Five programs, in `exemples/`, with their exact output (same name, `.attendu` extension, "attendu" meaning "expected").
 
-| Fichier | Ce qu'il montre |
+| File | What it shows |
 |---|---|
-| `01_expressions.fly` | priorités, `non`/`et`/`ou`, division et modulo de négatifs, fonctions prédéfinies, textes |
-| `02_cellules.fly` | `soit`, `lie`, affectation et mise à jour d'une cellule dérivée |
-| `03_losange.fly` | dépendances en losange sans état intermédiaire, `quand`, affectation sans changement |
-| `04_boucle.fly` | `pour` (dont zéro tour), `si`/`sinon`, `soit` dans un bloc, observateur sur un seuil |
-| `05_budget.fly` | programme plus long : plusieurs cellules, `sinon si`, observateur, `abs` |
+| `01_expressions.fly` | priorities, `non`/`et`/`ou`, division and modulo of negatives, built-in functions, texts |
+| `02_cellules.fly` | `soit`, `lie`, assignment and update of a derived cell |
+| `03_losange.fly` | diamond dependencies with no intermediate state, `quand`, assignment with no change |
+| `04_boucle.fly` | `pour` (including zero iterations), `si`/`sinon`, `soit` in a block, observer on a threshold |
+| `05_budget.fly` | a longer program: several cells, `sinon si`, observer, `abs` |
 
-## Erreurs
+## Errors
 
-Format des messages : `Erreur <genre> (ligne L, colonne C) : <message>`. Pour les erreurs d'exécution, seule la ligne est donnée.
+Message format: `Erreur <kind> (ligne L, colonne C) : <message>` (French for "Error <kind> (line L, column C): <message>"). For runtime errors, only the line is given. The messages themselves are in French; their meaning is given below the table.
 
-| Genre | Programme | Message attendu |
+| Kind | Program | Expected message |
 |---|---|---|
-| lexicale | `soit x = 3 @ 2;` | `Erreur lexicale (ligne 1, colonne 12) : caractère inattendu '@'` |
-| syntaxe | `soit x = ;` | `Erreur de syntaxe (ligne 1, colonne 10) : expression attendue, ';' trouvé` |
-| syntaxe | `affiche 1 < 2 < 3;` | `Erreur de syntaxe (ligne 1, colonne 15) : les comparaisons ne s'enchaînent pas, utilisez 'et'` |
-| syntaxe | `si vrai { lie x = 1; }` | `Erreur de syntaxe (ligne 1, colonne 11) : 'lie' n'est permis qu'au niveau supérieur` |
-| sémantique | `lie c = a + 1;` | `Erreur sémantique (ligne 1, colonne 9) : nom 'a' non déclaré` |
-| sémantique | `soit a = 1;` `lie b = a;` `b = 2;` | `Erreur sémantique (ligne 3, colonne 1) : 'b' est une cellule dérivée (lie), on ne peut pas lui affecter de valeur` |
-| exécution | `affiche 1 / 0;` | `Erreur d'exécution (ligne 1) : division par zéro` |
+| lexical | `soit x = 3 @ 2;` | `Erreur lexicale (ligne 1, colonne 12) : caractère inattendu '@'` |
+| syntax | `soit x = ;` | `Erreur de syntaxe (ligne 1, colonne 10) : expression attendue, ';' trouvé` |
+| syntax | `affiche 1 < 2 < 3;` | `Erreur de syntaxe (ligne 1, colonne 15) : les comparaisons ne s'enchaînent pas, utilisez 'et'` |
+| syntax | `si vrai { lie x = 1; }` | `Erreur de syntaxe (ligne 1, colonne 11) : 'lie' n'est permis qu'au niveau supérieur` |
+| semantic | `lie c = a + 1;` | `Erreur sémantique (ligne 1, colonne 9) : nom 'a' non déclaré` |
+| semantic | `soit a = 1;` `lie b = a;` `b = 2;` | `Erreur sémantique (ligne 3, colonne 1) : 'b' est une cellule dérivée (lie), on ne peut pas lui affecter de valeur` |
+| runtime | `affiche 1 / 0;` | `Erreur d'exécution (ligne 1) : division par zéro` |
 
-## Limites
+In English, in the same order: "unexpected character '@'"; "expression expected, ';' found"; "comparisons do not chain, use 'et'"; "'lie' is allowed only at top level"; "name 'a' not declared"; "'b' is a derived cell (lie), a value cannot be assigned to it"; "division by zero".
 
-Pas de fonctions définies par l'utilisateur, pas de listes, pas de décimaux, pas d'entrées-sorties (ni fichiers, ni clavier, ni réseau) : un programme Butterfly ne peut rien faire d'autre que calculer et afficher, ce qui simplifiera l'exécution en isolation du projet MCP.
+## Limits
 
-## Pistes d'extension
+No user-defined functions, no lists, no decimals, no input or output (no files, no keyboard, no network): a Butterfly program can do nothing but compute and print, which will simplify running it in isolation in the MCP project.
 
-- Autoriser une formule `lie` à citer une cellule déclarée **plus loin**, et détecter les cycles (`lie a = b; lie b = a;`) pendant l'analyse sémantique.
-- Autoriser `lie` et `quand` dans des blocs.
-- Ajouter des fonctions définies par l'utilisateur.
+## Possible extensions
+
+- Allow a `lie` formula to name a cell declared **further down**, and detect cycles (`lie a = b; lie b = a;`) during semantic analysis.
+- Allow `lie` and `quand` in blocks.
+- Add user-defined functions.

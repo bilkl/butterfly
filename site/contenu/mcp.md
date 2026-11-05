@@ -1,99 +1,99 @@
-# Le serveur MCP
+# The MCP server
 
-Butterfly est un langage que **aucune IA ne connaît**. Le serveur MCP lui donne les moyens de l'apprendre toute seule : lire la spécification et les exemples, vérifier ses programmes, se corriger d'après les erreurs, puis les exécuter. L'IA n'a besoin de rien d'autre que ce serveur.
+Butterfly is a language that **no AI knows**. The MCP server gives it the means to learn it on its own: read the specification and the examples, check its programs, correct itself from the errors, then run them. The AI needs nothing else but this server.
 
-[MCP](https://modelcontextprotocol.io) (Model Context Protocol) est un protocole ouvert qui permet à une application d'IA (Claude Code, Claude Desktop, un éditeur…) de se brancher sur des serveurs qui lui offrent des outils, des documents et des consignes.
+[MCP](https://modelcontextprotocol.io) (Model Context Protocol) is an open protocol that lets an AI application (Claude Code, Claude Desktop, an editor…) plug into servers that offer it tools, documents and instructions.
 
-## Brancher le serveur
+## Plugging in the server
 
-Depuis un clone du dépôt, avec [uv](https://docs.astral.sh/uv/) :
+From a clone of the repository, with [uv](https://docs.astral.sh/uv/):
 
 ```bash
-claude mcp add butterfly -- uv --directory /chemin/absolu/vers/butterfly run python -m serveur_butterfly
+claude mcp add butterfly -- uv --directory /absolute/path/to/butterfly run python -m serveur_butterfly
 ```
 
-Pour Claude Desktop, ou dans un fichier `.mcp.json` de projet, la configuration est la suivante (remplacez le chemin) :
+For Claude Desktop, or in a project `.mcp.json` file, the configuration is the following (replace the path):
 
 ```json
 {
   "mcpServers": {
     "butterfly": {
       "command": "uv",
-      "args": ["--directory", "/chemin/absolu/vers/butterfly",
+      "args": ["--directory", "/absolute/path/to/butterfly",
                "run", "python", "-m", "serveur_butterfly"]
     }
   }
 }
 ```
 
-Pour explorer le serveur sans IA, avec l'outil graphique officiel (il faut Node.js) :
+To explore the server without an AI, with the official graphical tool (it needs Node.js):
 
 ```bash
 npx @modelcontextprotocol/inspector uv run python -m serveur_butterfly
 ```
 
-## Les outils
+## The tools
 
-| Outil | Ce qu'il fait |
+| Tool | What it does |
 |---|---|
-| `tokenize` | découpe le programme en tokens (en cas d'erreur lexicale, renvoie ceux lus avant) |
-| `parse` | analyse la syntaxe et renvoie l'arbre en JSON (chaque nœud a une clé `type`) |
-| `check` | vérifie le programme sans l'exécuter, et renvoie **toutes** les erreurs d'un coup |
-| `transpile` | renvoie le code Python généré |
-| `format` | renvoie la présentation canonique, commentaires conservés |
-| `run` | exécute le programme dans un processus borné |
+| `tokenize` | splits the program into tokens (on a lexical error, returns those read before it) |
+| `parse` | analyses the syntax and returns the tree as JSON (each node has a `type` key) |
+| `check` | checks the program without running it, and returns **all** the errors at once |
+| `transpile` | returns the generated Python code |
+| `format` | returns the canonical layout, comments kept |
+| `run` | runs the program in a bounded process |
 
-Les cinq premiers sont annoncés **en lecture seule** : un hôte peut les appeler sans demander la permission à l'utilisateur.
+The first five are announced as **read-only**: a host can call them without asking the user for permission.
 
-Une erreur **dans le programme** de l'IA est une réponse normale (`ok: false`, avec la liste des erreurs). Le champ `is_error` du protocole est réservé aux cas où l'outil lui-même n'a pas pu travailler, par exemple un argument invalide. Chaque erreur contient son genre, son message, sa ligne, sa colonne et un `contexte` : le message complet avec la ligne fautive soulignée.
+An error **in the AI's program** is a normal answer (`ok: false`, with the list of errors). The protocol's `is_error` field is reserved for cases where the tool itself could not work, for example an invalid argument. Each error contains its kind, its message, its line, its column and a `contexte` field: the full message with the faulty line underlined.
 
-## Les resources et les prompts
+## Resources and prompts
 
-| URI | Contenu |
+| URI | Content |
 |---|---|
-| `butterfly://specification` | la spécification complète (lexique, grammaire, sémantique, erreurs) |
-| `butterfly://exemples` | la liste des programmes d'exemple |
-| `butterfly://exemples/{nom}` | le code d'un exemple |
-| `butterfly://exemples/{nom}/attendu` | la sortie exacte de cet exemple |
+| `butterfly://specification` | the full specification (lexicon, grammar, semantics, errors) |
+| `butterfly://exemples` | the list of example programs |
+| `butterfly://exemples/{nom}` | the code of an example |
+| `butterfly://exemples/{nom}/attendu` | the exact output of that example |
 
-Deux **prompts**, que l'utilisateur choisit dans son application : `ecrire_programme` (une méthode complète, de la lecture de la spécification à l'exécution) et `corriger_programme` (corriger un programme d'après les erreurs signalées).
+Two **prompts**, which the user picks in their application: `ecrire_programme` (write a program: a complete method, from reading the specification to running it) and `corriger_programme` (fix a program from the reported errors).
 
-## Une session type
+## A typical session
 
-Voici le scénario qui est rejoué par un test du dépôt, avec une IA scriptée qui ne connaît Butterfly que par le serveur :
+This is the scenario replayed by a test in the repository, with a scripted AI that knows Butterfly only through the server:
 
-1. Elle lit les **instructions du serveur**, qui la renvoient vers `butterfly://specification`, puis un exemple.
-2. Premier jet : elle oublie un `;`. `check` répond `ok: false` avec l'erreur à la **ligne 2**.
-3. Elle corrige. `check` signale alors une faute de frappe : `nom 'c' non déclaré`, **ligne 3**.
-4. Elle corrige encore. `check` répond `ok: true` et décrit les cellules du programme. `run` renvoie `statut: ok` et la sortie `somme : 13`.
-5. Elle appelle `format`, et la version formatée donne la même sortie.
+1. It reads the **server instructions**, which send it to `butterfly://specification`, then to an example.
+2. First draft: it forgets a `;`. `check` answers `ok: false` with the error on **line 2**.
+3. It fixes it. `check` then reports a typo: `nom 'c' non déclaré` ("name 'c' not declared"), on **line 3**.
+4. It fixes that too. `check` answers `ok: true` and describes the cells of the program. `run` returns `statut: ok` and the output `somme : 13`.
+5. It calls `format`, and the formatted version gives the same output.
 
-## Pourquoi `run` est sûr
+## Why `run` is safe
 
-Exécuter un programme écrit par une IA, c'est exécuter du code que personne n'a relu. Le serveur combine des protections techniques et la conception du langage.
+Running a program written by an AI means running code nobody has read. The server combines technical protections with the design of the language.
 
-| Risque | Protection |
+| Risk | Protection |
 |---|---|
-| boucle infinie | délai maximal (de 0,1 à 5 secondes), puis le processus est tué |
-| sortie infinie | lecture bornée à 64 Kio, puis le processus est tué |
-| mémoire excessive | limite d'espace d'adressage posée par le processus fils |
-| plantage du serveur | le programme tourne dans un **processus séparé**, jamais dans le serveur |
-| fichiers qui traînent | dossier temporaire supprimé quoi qu'il arrive |
-| lecture du canal MCP | l'entrée standard du fils est fermée |
-| variables d'environnement | le fils n'hérite d'aucune variable du serveur |
+| infinite loop | maximum delay (0.1 to 5 seconds), then the process is killed |
+| infinite output | reading bounded to 64 KiB, then the process is killed |
+| excessive memory | address-space limit set by the child process |
+| server crash | the program runs in a **separate process**, never in the server |
+| leftover files | temporary folder deleted whatever happens |
+| reading the MCP channel | the child's standard input is closed |
+| environment variables | the child inherits no variable from the server |
 
-Ce tableau ne protège pas l'accès aux fichiers ou au réseau. Ce qui le fait, c'est le langage : **un programme Butterfly ne peut ni lire de fichier, ni ouvrir de connexion, ni importer un module**. Et le générateur ne laisse passer aucun texte du programme dans le code Python : les textes sont écrits avec `repr`, et toutes les variables sont préfixées par `v_`. Un test vérifie qu'un texte contenant `__import__('os').system(...)` s'affiche tel quel, sans rien exécuter.
+This table does not protect file or network access. What does is the language: **a Butterfly program can neither read a file, nor open a connection, nor import a module**. And the generator lets no text of the program through into the Python code: texts are written with `repr`, and every variable is prefixed with `v_`. A test checks that a text containing `__import__('os').system(...)` is printed as is, without running anything.
 
-Un langage qui offrirait une fonction `lis_fichier(...)` demanderait un vrai bac à sable : un conteneur, un utilisateur dédié, un filtrage des appels système.
+A language that offered a `lis_fichier(...)` ("read file") function would need a real sandbox: a container, a dedicated user, system-call filtering.
 
-## Les statuts de `run`
+## The statuses of `run`
 
-| Statut | Signification |
+| Status | Meaning |
 |---|---|
-| `ok` | le programme s'est terminé normalement |
-| `erreur_compilation` | le programme est faux : il n'a pas été exécuté, les erreurs sont détaillées |
-| `erreur_execution` | une erreur à l'exécution, avec sa ligne ; la sortie précédente est conservée |
-| `delai_depasse` | le programme a dépassé le délai |
-| `sortie_tronquee` | le programme a affiché trop de texte |
-| `memoire_depassee` | le programme a consommé trop de mémoire |
-| `erreur_interne` | l'exécution a échoué sans erreur Butterfly identifiable |
+| `ok` | the program ended normally |
+| `erreur_compilation` | the program is wrong: it was not run, the errors are detailed |
+| `erreur_execution` | an error at run time, with its line; the previous output is kept |
+| `delai_depasse` | the program exceeded the time limit |
+| `sortie_tronquee` | the program printed too much text |
+| `memoire_depassee` | the program used too much memory |
+| `erreur_interne` | the run failed without an identifiable Butterfly error |

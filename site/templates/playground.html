@@ -1,29 +1,29 @@
 <section class="atelier">
-  <h1>Essayer Butterfly</h1>
+  <h1>Try Butterfly</h1>
   <p class="chapeau">
-    Écrivez un programme et exécutez-le ici : le vrai compilateur de Butterfly
-    tourne dans votre navigateur, grâce à Python compilé en WebAssembly.
+    Write a program and run it here: the real Butterfly compiler runs in your
+    browser, thanks to Python compiled to WebAssembly.
   </p>
 
   <div class="atelier-barre">
-    <label for="choix-exemple">Partir d'un exemple</label>
+    <label for="choix-exemple">Start from an example</label>
     <select id="choix-exemple"></select>
-    <button type="button" class="bouton" id="executer" disabled>Exécuter</button>
-    <span class="statut" id="statut" role="status">Chargement de Python, environ 10 Mo…</span>
+    <button type="button" class="bouton" id="executer" disabled>Run</button>
+    <span class="statut" id="statut" role="status">Loading Python, about 10 MB…</span>
   </div>
 
   <div class="atelier-grille">
     <div class="atelier-colonne">
-      <label for="editeur">Programme</label>
+      <label for="editeur">Program</label>
       <textarea id="editeur" spellcheck="false" autocapitalize="off" autocomplete="off" rows="18"></textarea>
-      <p class="aide">Ctrl + Entrée pour exécuter.</p>
+      <p class="aide">Ctrl + Enter to run.</p>
     </div>
     <div class="atelier-colonne">
-      <div class="onglets" role="tablist" aria-label="Résultat">
-        <button type="button" role="tab" aria-selected="true" id="onglet-sortie" aria-controls="panneau-sortie">Sortie</button>
-        <button type="button" role="tab" aria-selected="false" id="onglet-python" aria-controls="panneau-python">Python généré</button>
+      <div class="onglets" role="tablist" aria-label="Result">
+        <button type="button" role="tab" aria-selected="true" id="onglet-sortie" aria-controls="panneau-sortie">Output</button>
+        <button type="button" role="tab" aria-selected="false" id="onglet-python" aria-controls="panneau-python">Generated Python</button>
       </div>
-      <pre class="code sortie" id="panneau-sortie" role="tabpanel" aria-labelledby="onglet-sortie" aria-live="polite"><code>La sortie apparaîtra ici.</code></pre>
+      <pre class="code sortie" id="panneau-sortie" role="tabpanel" aria-labelledby="onglet-sortie" aria-live="polite"><code>The output will appear here.</code></pre>
       <pre class="code" id="panneau-python" role="tabpanel" aria-labelledby="onglet-python" hidden><code></code></pre>
     </div>
   </div>

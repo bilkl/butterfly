@@ -1,5 +1,5 @@
-# Un losange de dépendances : b et c dépendent de a, d dépend de b et c.
-# L'observateur ne voit jamais d'état intermédiaire (b à jour, c pas encore).
+# A dependency diamond: b and c depend on a, d depends on b and c.
+# The observer never sees an intermediate state (b up to date, c not yet).
 soit a = 1;
 lie b = a + 1;
 lie c = a * 10;

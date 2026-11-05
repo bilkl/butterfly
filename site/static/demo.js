@@ -1,7 +1,7 @@
-// La démonstration de l'accueil : le losange a → b, c → d du programme affiché.
-// Elle reproduit la sémantique du langage : une affectation recalcule chaque
-// cellule dérivée une seule fois, dans l'ordre, puis prévient l'observateur
-// seulement si la valeur de d a changé.
+// The home page demo: the diamond a → b, c → d of the program shown.
+// It reproduces the semantics of the language: an assignment recomputes each
+// derived cell exactly once, in order, then notifies the observer only if the
+// value of d has changed.
 (function () {
   var racine = document.getElementById("demo");
   if (!racine) return;
@@ -24,7 +24,7 @@
   function eclat(nom) {
     var cellule = document.getElementById("cell-" + nom);
     cellule.classList.remove("flash");
-    void cellule.getBoundingClientRect(); // relance l'animation
+    void cellule.getBoundingClientRect(); // restart the animation
     cellule.classList.add("flash");
   }
   function lien(id, actif) {
@@ -47,7 +47,7 @@
     nouveau = Math.max(-99, Math.min(99, Math.round(nouveau)));
     entree.value = String(nouveau);
     if (nouveau === valeurs.a) {
-      ligne("a vaut déjà " + nouveau + " : rien ne change, l'observateur reste silencieux.", true);
+      ligne("a is already " + nouveau + ": nothing changes, the observer stays silent.", true);
       return;
     }
     var avantD = valeurs.d;

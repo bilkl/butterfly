@@ -43,18 +43,18 @@ STATIC = SITE / "static"
 TEMPLATES = SITE / "templates"
 DIST = SITE / "dist"
 EXEMPLES = RACINE / "exemples"
-DEPOT = "https://github.com/bilkl/butterfly"
+DEPOT = "https://github.com/xbkh/butterfly"
 
-#: (fichier, libellé dans la navigation)
+#: (file, label in the navigation)
 PAGES = [
-    ("index", "Accueil"),
-    ("langage", "Le langage"),
+    ("index", "Home"),
+    ("langage", "The language"),
     ("guide", "Guide"),
-    ("reference", "Référence"),
-    ("exemples", "Exemples"),
-    ("playground", "Essayer"),
-    ("mcp", "Serveur MCP"),
-    ("compilateur", "Sous le capot"),
+    ("reference", "Reference"),
+    ("exemples", "Examples"),
+    ("playground", "Try it"),
+    ("mcp", "MCP server"),
+    ("compilateur", "Under the hood"),
 ]
 
 T = TypeToken
@@ -109,7 +109,7 @@ def pre(contenu: str, classe: str = "") -> str:
 
 
 def echec(message: str, source: str) -> SystemExit:
-    return SystemExit(f"ERREUR DE BUILD : {message}\n--- programme ---\n{source}")
+    return SystemExit(f"BUILD ERROR: {message}\n--- program ---\n{source}")
 
 
 def sortie_reelle(source: str) -> tuple[str, str | None]:
@@ -117,14 +117,16 @@ def sortie_reelle(source: str) -> tuple[str, str | None]:
     try:
         resultat = executer(source)
     except ErreurCompilation as erreur:
-        raise echec(f"le bloc `fly run` ne compile pas :\n{erreur}", source) from erreur
+        raise echec(
+            f"the `fly run` block does not compile:\n{erreur}", source
+        ) from erreur
     erreur_texte = contexte(resultat.erreur, source) if resultat.erreur else None
     return resultat.sortie, erreur_texte
 
 
 def lien_playground(source: str) -> str:
     lien = "playground.html#code=" + quote(source, safe="")
-    return f'<a class="essayer" href="{lien}">Essayer ce programme</a>'
+    return f'<a class="essayer" href="{lien}">Try this program</a>'
 
 
 def transcrire_repl(code: str) -> str:
@@ -175,7 +177,7 @@ def traiter_bloc(langue: str, options: list[str], code: str) -> str:
         else:
             _, texte_erreur = sortie_reelle(code)
             if texte_erreur is None:
-                raise echec("le bloc `fly erreur` ne produit aucune erreur", code)
+                raise echec("the `fly erreur` block produces no error", code)
             texte = texte_erreur
         return f'<div class="essai">{pre(colorer(code))}{pre(html.escape(texte), "sortie erreur")}</div>'
     if mode == "tokens":
@@ -186,12 +188,12 @@ def traiter_bloc(langue: str, options: list[str], code: str) -> str:
         texte = transpiler(code)
     elif mode == "analyse":
         analyse = compiler(code)
-        lignes = [f"cellules : {', '.join(analyse.cellules)}"]
+        lignes = [f"cells: {', '.join(analyse.cellules)}"]
         for nom, deps in analyse.dependances.items():
-            lignes.append(f"{nom} dépend de : {', '.join(sorted(deps)) or '(rien)'}")
+            lignes.append(f"{nom} depends on: {', '.join(sorted(deps)) or '(nothing)'}")
         texte = "\n".join(lignes)
     else:
-        raise echec(f"option de bloc inconnue : {mode!r}", code)
+        raise echec(f"unknown block option : {mode!r}", code)
     return f'<div class="essai">{pre(colorer(code))}{pre(html.escape(texte), "sortie")}</div>'
 
 
@@ -226,7 +228,7 @@ def rendre_markdown(texte: str) -> tuple[str, str]:
 def titre_et_corps(texte: str) -> tuple[str, str]:
     premiere, _, reste = texte.partition("\n")
     if not premiere.startswith("# "):
-        raise SystemExit("une page doit commencer par un titre « # … »")
+        raise SystemExit('a page must start with a "# …" title')
     return premiere[2:].strip(), reste.lstrip("\n")
 
 
@@ -241,7 +243,7 @@ def navigation(courante: str) -> str:
 def habiller(slug: str, titre: str, description: str, corps: str, classe: str) -> str:
     modele = (TEMPLATES / "base.html").read_text(encoding="utf-8")
     titre_page = (
-        "Butterfly : un langage réactif" if slug == "index" else f"{titre} : Butterfly"
+        "Butterfly: a reactive language" if slug == "index" else f"{titre}: Butterfly"
     )
     remplacements = {
         "@@TITRE@@": html.escape(titre_page),
@@ -259,9 +261,7 @@ def habiller(slug: str, titre: str, description: str, corps: str, classe: str) -
 def page_document(slug: str, texte: str, description: str) -> str:
     titre, corps_md = titre_et_corps(texte)
     corps, toc = rendre_markdown(corps_md)
-    aside = (
-        f'<aside class="toc" aria-label="Sur cette page">{toc}</aside>' if toc else ""
-    )
+    aside = f'<aside class="toc" aria-label="On this page">{toc}</aside>' if toc else ""
     contenu = (
         '<div class="doc-grid"><article class="doc">'
         f"<h1>{html.escape(titre)}</h1>{corps}</article>{aside}</div>"
@@ -270,10 +270,10 @@ def page_document(slug: str, texte: str, description: str) -> str:
 
 
 def texte_reference() -> str:
-    """La spécification du dépôt, sans la note de brouillon."""
+    """The repository specification, without the draft note."""
     texte = (RACINE / "specification.md").read_text(encoding="utf-8")
-    texte = re.sub(r"^> Brouillon de l'étape 1.*\n\n?", "", texte, flags=re.M)
-    texte = texte.replace("# Spécification de Butterfly", "# Référence du langage", 1)
+    texte = re.sub(r"^> Draft of step 1.*\n\n?", "", texte, flags=re.M)
+    texte = texte.replace("# Butterfly specification", "# Language reference", 1)
     return texte
 
 
@@ -291,7 +291,7 @@ def exemples_disponibles() -> list[dict[str, str]]:
         attendu = fichier.with_suffix(".attendu").read_text(encoding="utf-8")
         sortie, erreur = sortie_reelle(source)
         if erreur or sortie != attendu:
-            raise echec(f"{fichier.name} ne produit pas sa sortie attendue", source)
+            raise echec(f"{fichier.name} does not produce its expected output", source)
         titre = fichier.stem.split("_", 1)[1].replace("_", " ").capitalize()
         exemples.append(
             {"nom": fichier.stem, "titre": titre, "source": source,
@@ -302,11 +302,11 @@ def exemples_disponibles() -> list[dict[str, str]]:
 
 def page_exemples(exemples: list[dict[str, str]]) -> str:
     lignes = [
-        "# Exemples",
+        "# Examples",
         "",
-        "Ces cinq programmes sont ceux de la spécification. Chacun est exécuté à la "
-        "construction du site : la sortie affichée est celle du vrai compilateur, "
-        "et elle est comparée à la sortie attendue du dépôt.",
+        "These five programs are the ones of the specification. Each one is run when "
+        "the site is built: the output shown is the real compiler's, and it is "
+        "compared to the expected output stored in the repository.",
         "",
     ]
     for exemple in exemples:
@@ -338,8 +338,8 @@ def page_accueil(exemples: list[dict[str, str]]) -> str:
     return habiller(
         "index",
         "Butterfly",
-        "Butterfly est un langage réactif transpilé en Python : on change une valeur, "
-        "tout ce qui en dépend se met à jour tout seul.",
+        "Butterfly is a reactive language transpiled to Python: change a value, "
+        "and everything that depends on it updates by itself.",
         modele,
         "page-accueil",
     )
@@ -351,8 +351,8 @@ def page_playground(exemples: list[dict[str, str]]) -> str:
     modele = modele.replace("@@EXEMPLES_JSON@@", donnees)
     return habiller(
         "playground",
-        "Essayer",
-        "Écrivez et exécutez un programme Butterfly directement dans le navigateur.",
+        "Try it",
+        "Write and run a Butterfly program right in your browser.",
         modele,
         "page-playground",
     )
@@ -382,19 +382,19 @@ def construire() -> None:
         "exemples": page_document(
             "exemples",
             page_exemples(exemples),
-            "Les cinq programmes d'exemple de Butterfly, avec leur vraie sortie.",
+            "The five example programs of Butterfly, with their real output.",
         ),
         "reference": page_document(
             "reference",
             texte_reference(),
-            "Lexique, grammaire, priorités et sémantique de Butterfly.",
+            "Lexicon, grammar, priorities and semantics of Butterfly.",
         ),
     }
     descriptions = {
-        "langage": "Découvrir Butterfly pas à pas : cellules, observateurs, opérateurs, erreurs.",
-        "guide": "Installer Butterfly, lancer un programme, utiliser la CLI et le REPL.",
-        "mcp": "Le serveur MCP de Butterfly : une IA y apprend le langage, l'écrit et l'exécute.",
-        "compilateur": "Comment Butterfly fonctionne : lexer, parser, analyse, génération de Python.",
+        "langage": "Discover Butterfly step by step: cells, observers, operators, errors.",
+        "guide": "Install Butterfly, run a program, use the CLI and the REPL.",
+        "mcp": "The Butterfly MCP server: an AI learns the language there, writes it and runs it.",
+        "compilateur": "How Butterfly works: lexer, parser, analysis, Python generation.",
     }
     for slug, description in descriptions.items():
         texte = (CONTENU / f"{slug}.md").read_text(encoding="utf-8")
@@ -403,7 +403,7 @@ def construire() -> None:
     for slug, contenu in pages.items():
         (DIST / f"{slug}.html").write_text(contenu, encoding="utf-8")
     archive_du_compilateur()
-    print(f"site construit : {len(pages)} pages dans {DIST.relative_to(RACINE)}/")
+    print(f"site built: {len(pages)} pages in {DIST.relative_to(RACINE)}/")
 
 
 if __name__ == "__main__":

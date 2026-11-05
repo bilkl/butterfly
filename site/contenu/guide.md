@@ -1,65 +1,65 @@
-# Guide d'utilisation
+# User guide
 
-Ce guide explique comment installer Butterfly, lancer un programme et utiliser les outils fournis. Pour apprendre le langage lui-même, voir [Le langage](langage.html).
+This guide explains how to install Butterfly, run a program and use the tools that come with it. To learn the language itself, see [The language](langage.html).
 
-## Installer
+## Install
 
-Il faut Python 3.12 ou plus et [uv](https://docs.astral.sh/uv/), qui gère l'environnement et les dépendances.
+You need Python 3.12 or later and [uv](https://docs.astral.sh/uv/), which manages the environment and the dependencies.
 
 ```bash
-git clone https://github.com/bilkl/butterfly.git
+git clone https://github.com/xbkh/butterfly.git
 cd butterfly
 uv sync
 ```
 
-Vérifiez l'installation :
+Check the installation:
 
 ```bash
 uv run python -m butterfly --version
 ```
 
-Si vous préférez ne rien installer, le [bac à sable](playground.html) exécute Butterfly dans votre navigateur.
+If you would rather install nothing, the [sandbox](playground.html) runs Butterfly in your browser.
 
-## Votre premier programme
+## Your first program
 
-Écrivez ceci dans un fichier `bonjour.fly` :
+Write this in a file named `bonjour.fly` ("hello"):
 
 ```fly run
 soit nom = "monde";
 affiche "Bonjour,", nom;
 ```
 
-Puis exécutez-le :
+Then run it:
 
 ```bash
 uv run python -m butterfly run bonjour.fly
 ```
 
-## Les commandes
+## The commands
 
-Toutes les commandes prennent un fichier `.fly`, ou `-` pour lire le programme sur l'entrée standard.
+Every command takes a `.fly` file, or `-` to read the program from standard input.
 
-| Commande | Ce qu'elle fait |
+| Command | What it does |
 |---|---|
-| `run` | exécute le programme |
-| `check` | vérifie le programme sans l'exécuter, et signale toutes les erreurs |
-| `transpile` | affiche le code Python généré |
-| `format` | affiche le programme dans sa présentation canonique (`-w` réécrit le fichier) |
-| `tokens` | affiche les tokens, avec leur position |
-| `ast` | affiche l'arbre syntaxique |
-| `repl` | ouvre une session interactive |
+| `run` | runs the program |
+| `check` | checks the program without running it, and reports all the errors |
+| `transpile` | prints the generated Python code |
+| `format` | prints the program in its canonical layout (`-w` rewrites the file) |
+| `tokens` | prints the tokens, with their position |
+| `ast` | prints the syntax tree |
+| `repl` | opens an interactive session |
 
-Par exemple, pour reformater un fichier en place :
+For example, to reformat a file in place:
 
 ```bash
 uv run python -m butterfly format -w bonjour.fly
 ```
 
-Le code de retour est `0` si tout va bien, `1` si le programme a une erreur, et `2` si le fichier est illisible.
+The exit code is `0` if all is well, `1` if the program has an error, and `2` if the file cannot be read.
 
-## Comprendre un message d'erreur
+## Understanding an error message
 
-Chaque message indique le genre de l'erreur, sa position, ce qui ne va pas, puis la ligne fautive avec un repère sous la colonne :
+Each message gives the kind of the error, its position and what is wrong, then the faulty line with a marker under the column. The messages themselves are in French:
 
 ```fly erreur
 soit total = 0;
@@ -69,20 +69,20 @@ si total > 10 {
 affiche resultat;
 ```
 
-Quelques messages fréquents et leur remède :
+Some frequent messages and their remedy:
 
-| Message | Ce qu'il faut faire |
+| Message | Meaning and what to do |
 |---|---|
-| `';' attendu à la fin de l'instruction` | ajouter le `;` oublié (le repère est juste après la dernière instruction) |
-| `nom 'x' non déclaré` | déclarer `x` avec `soit` ou `lie` **avant** de l'utiliser |
-| `'x' est une cellule dérivée (lie)` | une cellule `lie` ne se modifie pas : modifiez ses sources |
-| `'x' est déjà déclaré` | choisir un autre nom : un nom ne peut pas en masquer un autre |
-| `les comparaisons ne s'enchaînent pas` | écrire `a < b et b < c` |
-| `division par zéro` | tester le diviseur avant de diviser |
+| `';' attendu à la fin de l'instruction` | `';'` expected at the end of the statement: add the forgotten `;` (the marker is just after the last statement) |
+| `nom 'x' non déclaré` | name `x` not declared: declare `x` with `soit` or `lie` **before** using it |
+| `'x' est une cellule dérivée (lie)` | `x` is a derived cell: a `lie` cell is not modified, change its sources instead |
+| `'x' est déjà déclaré` | `x` is already declared: choose another name, a name cannot hide another |
+| `les comparaisons ne s'enchaînent pas` | comparisons do not chain: write `a < b et b < c` |
+| `division par zéro` | division by zero: test the divisor before dividing |
 
-## Le REPL
+## The REPL
 
-Le REPL garde l'état d'une ligne à l'autre. Une expression seule est affichée directement, et une entrée sur plusieurs lignes est lue jusqu'à l'accolade fermante.
+The REPL keeps its state from one line to the next. A lone expression is printed directly, and an entry spanning several lines is read up to the closing brace.
 
 ```repl
 soit a = 2;
@@ -95,11 +95,11 @@ quand double { affiche "double change :", double; }
 a = 11;
 ```
 
-Les commandes `:aide`, `:source` (le programme accumulé), `:reinit` et `:quitter` sont disponibles.
+The commands `:aide` (help), `:source` (the program accumulated so far), `:reinit` (reset) and `:quitter` (quit) are available.
 
-## Utiliser Butterfly depuis Python
+## Using Butterfly from Python
 
-La façade `butterfly.compilateur` est tout ce qu'il faut :
+The `butterfly.compilateur` facade is all you need:
 
 ```python
 from butterfly.compilateur import executer
@@ -109,18 +109,18 @@ print(resultat.sortie)  # 42
 print(resultat.ok)  # True
 ```
 
-Une erreur d'exécution est renvoyée dans `resultat.erreur`, avec ce qui a été affiché avant. Une erreur de compilation lève `ErreurCompilation`, qui contient toutes les erreurs trouvées.
+A runtime error is returned in `resultat.erreur`, along with what was printed before it. A compilation error raises `ErreurCompilation`, which holds all the errors found.
 
-## Lancer les tests
+## Running the tests
 
 ```bash
-uv run pytest                                   # tous les tests
-uv run mypy butterfly serveur_butterfly tests   # typage strict
+uv run pytest                                   # all the tests
+uv run mypy butterfly serveur_butterfly tests   # strict typing
 uv run ruff check .                             # style
 ```
 
-La spécification est exécutable : un test lit le tableau d'erreurs de la [référence](reference.html) et vérifie que chaque programme fautif produit exactement le message annoncé.
+The specification is executable: a test reads the table of errors in the [reference](reference.html) and checks that each faulty program produces exactly the announced message.
 
-## Brancher une IA
+## Plugging in an AI
 
-Le dépôt contient un serveur MCP qui permet à une IA d'apprendre Butterfly, de vérifier ses programmes et de les exécuter. Tout est expliqué sur la page [Serveur MCP](mcp.html).
+The repository contains an MCP server that lets an AI learn Butterfly, check its programs and run them. Everything is explained on the [MCP server](mcp.html) page.

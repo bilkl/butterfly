@@ -1,6 +1,6 @@
 """Étape 1 : la spécification et ses programmes d'exemple.
 
-La spécification est **exécutable** : le tableau de la section « Erreurs » est lu
+La spécification est **exécutable** : le tableau de la section « Errors » est lu
 par ce test, et chaque programme fautif doit produire exactement le message
 annoncé.
 """
@@ -27,15 +27,15 @@ def test_chaque_exemple_a_un_fichier_attendu(programme: Path) -> None:
 
 
 def lire_tableau_des_erreurs() -> list[tuple[str, str, str]]:
-    """Les lignes ``| genre | `programme` | `message` |`` de la spécification."""
+    """Les lignes ``| kind | `programme` | `message` |`` de la spécification."""
     texte = (RACINE / "specification.md").read_text(encoding="utf-8")
-    section = texte.split("\n## Erreurs\n", 1)[1].split("\n## ", 1)[0]
+    section = texte.split("\n## Errors\n", 1)[1].split("\n## ", 1)[0]
     lignes: list[tuple[str, str, str]] = []
     for ligne in section.splitlines():
         cellules = [c.strip() for c in ligne.strip().strip("|").split("|")]
         if (
             len(cellules) != 3
-            or cellules[0] in ("Genre", "")
+            or cellules[0] in ("Kind", "")
             or set(cellules[0]) <= {"-"}
         ):
             continue
@@ -51,7 +51,7 @@ TABLEAU = lire_tableau_des_erreurs()
 def test_le_tableau_des_erreurs_de_la_specification_a_ete_lu() -> None:
     assert len(TABLEAU) >= 6
     assert {genre for genre, _, _ in TABLEAU} >= {
-        "lexicale", "syntaxe", "sémantique", "exécution",
+        "lexical", "syntax", "semantic", "runtime",
     }  # fmt: skip
 
 
@@ -59,7 +59,7 @@ def test_le_tableau_des_erreurs_de_la_specification_a_ete_lu() -> None:
 def test_chaque_erreur_de_la_specification_produit_le_message_annonce(
     genre: str, programme: str, message: str
 ) -> None:
-    if genre == "exécution":
+    if genre == "runtime":
         resultat = executer(programme)
         assert resultat.erreur is not None
         assert str(resultat.erreur) == message

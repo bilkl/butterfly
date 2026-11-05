@@ -1,36 +1,36 @@
-# Sous le capot
+# Under the hood
 
-Butterfly n'utilise aucun outil de génération de parser : toute la chaîne de compilation est écrite à la main, en Python.
+Butterfly uses no parser-generator tool: the whole compilation chain is written by hand, in Python.
 
 ```text
-texte source → lexer → tokens → parser → arbre → analyse → arbre vérifié → générateur → Python
+source text → lexer → tokens → parser → tree → analysis → checked tree → generator → Python
 ```
 
-Chaque étage a son entrée, sa sortie, et ses tests. Tous les exemples de cette page sont produits par le vrai compilateur.
+Each stage has its input, its output and its tests. All the examples on this page are produced by the real compiler.
 
-## 1. Le lexer : du texte aux tokens
+## 1. The lexer: from text to tokens
 
-**Module** `butterfly/lexer.py`. Il découpe le texte en « mots » (les *tokens*), avec leur position. C'est un **générateur** : il ne lit le source qu'au fur et à mesure, donc les tokens lus avant une erreur lexicale sont déjà disponibles.
+**Module** `butterfly/lexer.py`. It splits the text into "words" (the *tokens*), with their position. It is a **generator**: it reads the source only as it goes, so the tokens read before a lexical error are already available.
 
 ```fly tokens
 soit total = prix * 2; # un commentaire
 ```
 
-Il lit toujours le plus long token possible : `<=` est un seul token, et `1..5` donne trois tokens (`1`, `..`, `5`), ce qui explique que les nombres décimaux n'existent pas.
+It always reads the longest possible token: `<=` is a single token, and `1..5` gives three tokens (`1`, `..`, `5`), which is why decimal numbers do not exist.
 
-## 2. Le parser : des tokens à l'arbre
+## 2. The parser: from tokens to the tree
 
-**Module** `butterfly/parser.py`. Les instructions sont analysées par **descente récursive** (une méthode par règle de la grammaire). Les expressions le sont par un **parser de Pratt** : une table donne la priorité de chaque opérateur, et ajouter un opérateur revient à ajouter une ligne dans la table.
+**Module** `butterfly/parser.py`. Statements are analysed by **recursive descent** (one method per grammar rule). Expressions are analysed by a **Pratt parser**: a table gives the priority of each operator, and adding an operator means adding one line to the table.
 
 ```fly ast
 lie c = a + b * 2;
 ```
 
-Le `*` est plus profond dans l'arbre que le `+` : c'est ce qui le rend prioritaire. Le parser **ne s'arrête pas à la première erreur** : il la note, saute jusqu'à l'instruction suivante, et signale toutes les erreurs d'un coup.
+The `*` is deeper in the tree than the `+`: that is what gives it priority. The parser **does not stop at the first error**: it notes it, skips to the next statement, and reports all the errors at once.
 
-## 3. L'analyse sémantique : ce que la grammaire ne peut pas voir
+## 3. Semantic analysis: what the grammar cannot see
 
-**Module** `butterfly/semantique.py`. Elle vérifie les noms (déclarés avant usage, jamais masqués), les affectations (jamais à une cellule dérivée), les observateurs et les appels de fonctions. Elle produit aussi ce dont le générateur a besoin : les cellules du niveau supérieur et, pour chaque cellule dérivée, les cellules citées dans sa formule.
+**Module** `butterfly/semantique.py`. It checks names (declared before use, never hidden), assignments (never to a derived cell), observers and function calls. It also produces what the generator needs: the top-level cells and, for each derived cell, the cells named in its formula.
 
 ```fly analyse
 soit a = 1;
@@ -39,9 +39,9 @@ lie c = a + 1;
 lie d = c * b;
 ```
 
-## 4. Le générateur : de l'arbre au Python
+## 4. The generator: from the tree to Python
 
-**Module** `butterfly/generateur.py`. Le point clé est la **propagation**. Butterfly n'embarque aucun moteur réactif à l'exécution : le compilateur calcule, pour chaque affectation d'une source, la liste ordonnée des cellules dérivées à recalculer et des observateurs à prévenir, puis écrit le code qui le fait.
+**Module** `butterfly/generateur.py`. The key point is **propagation**. Butterfly embeds no reactive engine at run time: for each assignment to a source, the compiler works out the ordered list of derived cells to recompute and of observers to notify, then writes the code that does it.
 
 ```fly python
 soit prix = 20;
@@ -55,47 +55,47 @@ quand total {
 quantite = 5;
 ```
 
-Lisez le code généré :
+Read the generated code:
 
-- chaque cellule dérivée a une fonction `_calc_…` qu'on rappelle à chaque recalcul ;
-- avant l'affectation, la valeur des cellules observées est mise de côté (`_av_total`) ;
-- après l'affectation, les cellules dérivées touchées sont recalculées **dans l'ordre de leur déclaration**, qui est un ordre topologique valide puisqu'on déclare avant d'utiliser ;
-- enfin, `_change` compare l'ancienne et la nouvelle valeur, et l'observateur `_obs_0` n'est appelé que si elle a changé.
+- each derived cell has a `_calc_…` function that is called again at each recomputation;
+- before the assignment, the value of the observed cells is set aside (`_av_total`, where `av` stands for "avant", before);
+- after the assignment, the affected derived cells are recomputed **in the order of their declaration**, which is a valid topological order since names are declared before use;
+- finally, `_change` compares the old and the new value, and the observer `_obs_0` is called only if it changed.
 
-Toutes les variables sont préfixées par `v_`, et les textes écrits avec `repr` : aucun nom ni aucun texte du programme ne peut jamais produire du Python que le compilateur n'a pas prévu.
+All variables are prefixed with `v_`, and texts are written with `repr`: no name and no text of the program can ever produce Python that the compiler did not plan for.
 
-## 5. Le runtime : les erreurs à l'exécution
+## 5. The runtime: errors at run time
 
-**Module** `butterfly/runtime.py`. Butterfly n'a pas de types déclarés : ce sont les valeurs qui portent un type, et de petites fonctions vérifient les types à l'exécution. Chacune reçoit en argument la **ligne du programme Butterfly** d'où vient l'appel (on le voit dans le code généré ci-dessus) : c'est ainsi qu'une erreur d'exécution indique la bonne ligne.
+**Module** `butterfly/runtime.py`. Butterfly has no declared types: the values carry a type, and small functions check types at run time. Each one receives as an argument the **line of the Butterfly program** the call comes from (you can see it in the generated code above): that is how a runtime error reports the right line.
 
-## 6. Autour du compilateur
+## 6. Around the compiler
 
-| Module | Rôle |
+| Module | Role |
 |---|---|
-| `compilateur.py` | la façade (`compiler`, `transpiler`, `executer`) : tout le reste s'appuie dessus |
-| `cli.py` | la ligne de commande, avec ses codes de retour |
-| `repl.py` | la session interactive |
-| `formateur.py` | la présentation canonique, commentaires et lignes vides conservés |
-| `backend.py` | un `Protocol` : le générateur Python et le formateur sont deux backends, un troisième s'ajoute sans rien modifier |
+| `compilateur.py` | the facade (`compiler`, `transpiler`, `executer`): everything else builds on it |
+| `cli.py` | the command line, with its exit codes |
+| `repl.py` | the interactive session |
+| `formateur.py` | the canonical layout, comments and blank lines kept |
+| `backend.py` | a `Protocol`: the Python generator and the formatter are two backends, a third can be added without changing anything |
 
-Le **REPL** n'a pas d'état à sérialiser. Il garde le texte des entrées réussies et recompile le tout à chaque nouvelle entrée. Comme un programme Butterfly est déterministe, la sortie de « l'historique plus la nouvelle entrée » commence par celle de l'historique : il suffit d'afficher la suite.
+The **REPL** has no state to serialise. It keeps the text of the successful entries and recompiles everything at each new entry. Since a Butterfly program is deterministic, the output of "the history plus the new entry" starts with that of the history: it is enough to display the rest.
 
-## Les choix de conception
+## Design choices
 
-| Choix | Raison |
+| Choice | Reason |
 |---|---|
-| déclarer avant d'utiliser | une formule ne cite que des cellules existantes : pas de cycle possible, et l'ordre de déclaration est un ordre de calcul valide |
-| `lie` et `quand` seulement au niveau supérieur | le graphe de dépendances est connu à la compilation |
-| un observateur ne modifie pas le niveau supérieur | sinon il pourrait se déclencher lui-même à l'infini |
-| un nom n'en masque jamais un autre | Python n'a pas de portée de bloc : le code généré garde ainsi le même sens |
-| comparaisons non chaînables | un choix net, plutôt qu'une lecture ambiguë de `a < b < c` |
-| uniquement des entiers | `1..5` (plage) et `1.5` (décimal) ne se confondent jamais |
-| aucune entrée-sortie | un programme ne peut rien faire d'autre que calculer et afficher : sûr à exécuter |
+| declare before use | a formula names only existing cells: no cycle is possible, and the order of declaration is a valid computation order |
+| `lie` and `quand` only at top level | the dependency graph is known at compile time |
+| an observer does not modify the top level | otherwise it could trigger itself forever |
+| a name never hides another | Python has no block scope: the generated code keeps the same meaning this way |
+| non-chaining comparisons | a clear choice, rather than an ambiguous reading of `a < b < c` |
+| integers only | `1..5` (a range) and `1.5` (a decimal) can never be confused |
+| no input or output | a program can do nothing but compute and print: safe to run |
 
-## Les tests
+## The tests
 
-Le dépôt compte plus de 360 tests, un fichier par étape de la chaîne. Trois idées les rendent utiles :
+The repository has more than 360 tests, one file per stage of the chain. Three ideas make them useful:
 
-- la **spécification est exécutable** : un test lit son tableau d'erreurs et vérifie chaque message ;
-- **chaque exemple** est exécuté et sa sortie comparée à la sortie attendue, y compris après passage par le formateur ;
-- le serveur MCP est testé **dans le même processus**, puis **en vrai**, lancé en sous-processus comme le ferait un hôte.
+- the **specification is executable**: a test reads its table of errors and checks each message;
+- **every example** is run and its output compared to the expected output, including after going through the formatter;
+- the MCP server is tested **in the same process**, then **for real**, launched as a subprocess the way a host would.

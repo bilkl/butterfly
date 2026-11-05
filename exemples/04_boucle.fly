@@ -1,4 +1,4 @@
-# Une boucle alimente des cellules ; un observateur réagit au franchissement d'un seuil.
+# A loop feeds cells; an observer reacts when a threshold is crossed.
 soit somme = 0;
 lie moyenne = somme / 4;
 lie grand = somme > 5;

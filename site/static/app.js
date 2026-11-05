@@ -1,4 +1,4 @@
-// Bouton de thème : clair, sombre, ou le réglage du système.
+// Theme button: light, dark, or the system setting.
 (function () {
   var bouton = document.querySelector(".theme");
   if (!bouton) return;
@@ -10,6 +10,6 @@
   bouton.addEventListener("click", function () {
     var suivant = courant() === "dark" ? "light" : "dark";
     document.documentElement.dataset.theme = suivant;
-    try { localStorage.setItem("theme", suivant); } catch (e) { /* stockage indisponible */ }
+    try { localStorage.setItem("theme", suivant); } catch (e) { /* storage unavailable */ }
   });
 })();

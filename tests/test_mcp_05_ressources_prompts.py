@@ -38,7 +38,7 @@ async def test_les_modeles_d_uri_sont_annonces(client: Client) -> None:
 async def test_la_specification_est_lisible(client: Client) -> None:
     texte = await lire(client, "butterfly://specification")
     assert texte == (RACINE / "specification.md").read_text(encoding="utf-8")
-    assert "Grammaire (EBNF)" in texte
+    assert "Grammar (EBNF)" in texte
 
 
 async def test_l_index_liste_chaque_exemple_avec_sa_description(client: Client) -> None:
@@ -46,7 +46,7 @@ async def test_l_index_liste_chaque_exemple_avec_sa_description(client: Client) 
     for nom in NOMS:
         assert f"butterfly://exemples/{nom}" in index
         assert f"butterfly://exemples/{nom}/attendu" in index
-    assert "Une cellule dérivée (lie) suit ses sources" in index
+    assert "A derived cell (lie) follows its sources" in index
 
 
 @pytest.mark.parametrize("nom", NOMS)

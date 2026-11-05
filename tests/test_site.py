@@ -72,6 +72,6 @@ def test_le_playground_dispose_du_compilateur_en_archive(site: Path) -> None:
 
 def test_la_page_de_reference_vient_de_la_specification(site: Path) -> None:
     reference = (site / "reference.html").read_text(encoding="utf-8")
-    assert "Référence du langage" in reference
-    assert "Grammaire (EBNF)" in reference
-    assert "Brouillon" not in reference
+    assert "Language reference" in reference
+    assert "Grammar (EBNF)" in reference
+    assert "Draft of step 1" not in reference
