@@ -1,4 +1,4 @@
-"""Point d'entrée : ``python -m serveur_butterfly`` (ou ``butterfly-mcp``).
+"""Point d'entrée : ``python -m butterfly_server`` (ou ``butterfly-mcp``).
 
 Le serveur parle MCP en **stdio** : l'hôte (Claude Code, Claude Desktop, un IDE)
 le lance comme sous-processus et dialogue sur son entrée et sa sortie standard.
