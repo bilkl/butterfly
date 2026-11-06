@@ -1,31 +1,31 @@
 # Monthly budget: expenses that change and an alert on what is left.
-soit salaire = 2000;
-soit loyer = 800;
-soit courses = 300;
-soit loisirs = 150;
+soit salary = 2000;
+soit rent = 800;
+soit groceries = 300;
+soit leisure = 150;
 
-lie depenses = loyer + courses + loisirs;
-lie reste = salaire - depenses;
-lie taux = depenses * 100 / salaire;
+lie expenses = rent + groceries + leisure;
+lie remaining = salary - expenses;
+lie rate = expenses * 100 / salary;
 
-quand reste {
-    si reste < 0 {
-        affiche "déficit de", abs(reste);
-    } sinon si reste < 200 {
-        affiche "juste, il reste", reste;
+quand remaining {
+    si remaining < 0 {
+        affiche "déficit de", abs(remaining);
+    } sinon si remaining < 200 {
+        affiche "juste, il reste", remaining;
     } sinon {
-        affiche "confortable, il reste", reste;
+        affiche "confortable, il reste", remaining;
     }
 }
 
-affiche "départ :", depenses, reste, taux;
-courses = courses + 400;
-loisirs = 0;
-loisirs = 0;
-loyer = loyer + 600;
-salaire = salaire + 150;
+affiche "départ :", expenses, remaining, rate;
+groceries = groceries + 400;
+leisure = 0;
+leisure = 0;
+rent = rent + 600;
+salary = salary + 150;
 
-pour mois dans 1..4 {
-    affiche "mois", mois, ":", reste * mois;
+pour month dans 1..4 {
+    affiche "mois", month, ":", remaining * month;
 }
-affiche "taux final :", taux;
+affiche "taux final :", rate;

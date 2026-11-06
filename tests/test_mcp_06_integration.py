@@ -73,8 +73,8 @@ async def test_exercice_final_une_ia_apprend_butterfly_par_le_serveur_seul() -> 
         brouillon = (
             "soit a = 2;\n"
             "soit b = 3\n"
-            "lie somme = a + b;\n"
-            'quand somme { affiche "somme :", somme; }\n'
+            "lie sum = a + b;\n"
+            'quand sum { affiche "somme :", sum; }\n'
             "a = 10;\n"
         )
         verdict = await structure(client, "check", brouillon)
@@ -95,7 +95,7 @@ async def test_exercice_final_une_ia_apprend_butterfly_par_le_serveur_seul() -> 
         brouillon = brouillon.replace("a + c", "a + b")
         verdict = await structure(client, "check", brouillon)
         assert verdict["ok"] is True
-        assert [c["nom"] for c in verdict["cellules"]] == ["a", "b", "somme"]
+        assert [c["nom"] for c in verdict["cellules"]] == ["a", "b", "sum"]
         execution = await structure(client, "run", brouillon)
         assert execution["statut"] == "ok"
         assert execution["sortie"] == "somme : 13\n"

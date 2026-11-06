@@ -5,16 +5,16 @@ A **reactive** programming language, transpiled to Python, with its MCP server.
 In Butterfly, you change a single value and everything that depends on it updates by itself: that is the butterfly effect.
 
 ```
-soit prix = 20;
-soit quantite = 3;
-lie total = prix * quantite;     # total is ALWAYS prix * quantite
+soit price = 20;
+soit quantity = 3;
+lie total = price * quantity;     # total is ALWAYS price * quantity
 
 quand total {                    # runs every time total changes
     affiche "nouveau total :", total;
 }
 
-quantite = 5;                    # prints: nouveau total : 100
-prix = prix + 5;                 # prints: nouveau total : 125
+quantity = 5;                    # prints: nouveau total : 100
+price = price + 5;                 # prints: nouveau total : 125
 ```
 
 - `soit` ("let") creates a source cell, which can be modified.

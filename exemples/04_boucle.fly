@@ -1,19 +1,19 @@
 # A loop feeds cells; an observer reacts when a threshold is crossed.
-soit somme = 0;
-lie moyenne = somme / 4;
-lie grand = somme > 5;
+soit sum = 0;
+lie average = sum / 4;
+lie big = sum > 5;
 
-quand grand {
+quand big {
     affiche "seuil dépassé";
 }
 
 pour i dans 1..5 {
-    soit carre = i * i;
-    somme = somme + i;
+    soit square = i * i;
+    sum = sum + i;
     si i % 2 == 0 {
-        affiche "pair", i, carre, moyenne;
+        affiche "pair", i, square, average;
     } sinon {
-        affiche "impair", i, carre, moyenne;
+        affiche "impair", i, square, average;
     }
 }
 
@@ -21,4 +21,4 @@ pour j dans 3..3 {
     affiche "jamais";
 }
 
-affiche somme, moyenne, grand;
+affiche sum, average, big;

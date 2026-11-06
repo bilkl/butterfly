@@ -16,16 +16,16 @@ The keywords of the language (`soit`, `lie`, `quand`…) and its error messages 
 ## A program to set the tone
 
 ```
-soit prix = 20;
-soit quantite = 3;
-lie total = prix * quantite;
+soit price = 20;
+soit quantity = 3;
+lie total = price * quantity;
 
 quand total {
     affiche "nouveau total :", total;
 }
 
-quantite = 5;       # prints: nouveau total : 100
-prix = prix + 5;    # prints: nouveau total : 125
+quantity = 5;       # prints: nouveau total : 100
+price = price + 5;    # prints: nouveau total : 125
 ```
 
 ## Lexicon
@@ -134,7 +134,7 @@ Nobody therefore sees an intermediate state: in a diamond `a → b, c → d`, `d
 
 ### Blocks and scopes
 
-A block opens a scope: a name declared with `soit` in a block no longer exists after its `}`. The body of a loop is a new block **at each iteration**: `soit carre = i * i;` ("carre" is "square") is therefore redeclared at each iteration without error. The name of a sibling block can be reused. A name used outside its scope is a semantic error ("name not declared").
+A block opens a scope: a name declared with `soit` in a block no longer exists after its `}`. The body of a loop is a new block **at each iteration**: `soit square = i * i;` is therefore redeclared at each iteration without error. The name of a sibling block can be reused. A name used outside its scope is a semantic error ("name not declared").
 
 > Python has no block scope. Since Butterfly forbids hiding a name, the generated Python keeps the same meaning; the semantic analysis only has to refuse uses outside the scope.
 

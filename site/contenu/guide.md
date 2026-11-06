@@ -25,8 +25,8 @@ If you would rather install nothing, the [sandbox](playground.html) runs Butterf
 Write this in a file named `bonjour.fly` ("hello"):
 
 ```fly run
-soit nom = "monde";
-affiche "Bonjour,", nom;
+soit name = "monde";
+affiche "Bonjour,", name;
 ```
 
 Then run it:
@@ -66,7 +66,7 @@ soit total = 0;
 si total > 10 {
     affiche total;
 }
-affiche resultat;
+affiche result;
 ```
 
 Some frequent messages and their remedy:

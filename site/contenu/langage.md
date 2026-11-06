@@ -9,13 +9,13 @@ The keywords (`soit`, `lie`, `quand`, `si`, `pour`, `affiche`…) and the error 
 `soit` ("let") creates a **source cell**: you can change it whenever you like. `lie` ("bind") creates a **derived cell**: it is always equal to the result of its formula. `affiche` ("show") prints its values separated by a space.
 
 ```fly run
-soit prix = 20;
-soit quantite = 3;
-lie total = prix * quantite;
+soit price = 20;
+soit quantity = 3;
+lie total = price * quantity;
 affiche "total :", total;
-quantite = 5;
+quantity = 5;
 affiche "total :", total;
-prix = prix + 5;
+price = price + 5;
 affiche "total :", total;
 ```
 
@@ -27,10 +27,10 @@ Nobody recomputed `total`. As soon as a source changes, every derived cell that 
 
 ```fly run
 soit temperature = 18;
-lie chaud = temperature > 25;
+lie hot = temperature > 25;
 
-quand chaud {
-    affiche "il fait chaud :", chaud;
+quand hot {
+    affiche "il fait chaud :", hot;
 }
 
 temperature = 22;
@@ -39,7 +39,7 @@ temperature = 30;
 temperature = 20;
 ```
 
-The observer spoke only twice, although the temperature changed four times. What matters is the value of `chaud` ("hot"): it changes only when the temperature crosses 25 degrees, in either direction. Three rules to remember:
+The observer spoke only twice, although the temperature changed four times. What matters is the value of `hot`: it changes only when the temperature crosses 25 degrees, in either direction. Three rules to remember:
 
 - an observer is **not** triggered when the cell is created;
 - it is triggered only if the value **really changed** (assigning `a = 2;` when `a` is already 2 does nothing);
@@ -102,10 +102,10 @@ affiche 1 < 2 < 3;
 `si` is "if", `sinon` is "else", and `pour i dans 1..4` is "for i in 1..4".
 
 ```fly run
-soit note = 14;
-si note >= 16 {
+soit grade = 14;
+si grade >= 16 {
     affiche "très bien";
-} sinon si note >= 12 {
+} sinon si grade >= 12 {
     affiche "bien";
 } sinon {
     affiche "à revoir";

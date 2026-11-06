@@ -13,7 +13,7 @@ Each stage has its input, its output and its tests. All the examples on this pag
 **Module** `butterfly/lexer.py`. It splits the text into "words" (the *tokens*), with their position. It is a **generator**: it reads the source only as it goes, so the tokens read before a lexical error are already available.
 
 ```fly tokens
-soit total = prix * 2; # un commentaire
+soit total = price * 2; # un commentaire
 ```
 
 It always reads the longest possible token: `<=` is a single token, and `1..5` gives three tokens (`1`, `..`, `5`), which is why decimal numbers do not exist.
@@ -44,15 +44,15 @@ lie d = c * b;
 **Module** `butterfly/generateur.py`. The key point is **propagation**. Butterfly embeds no reactive engine at run time: for each assignment to a source, the compiler works out the ordered list of derived cells to recompute and of observers to notify, then writes the code that does it.
 
 ```fly python
-soit prix = 20;
-soit quantite = 3;
-lie total = prix * quantite;
+soit price = 20;
+soit quantity = 3;
+lie total = price * quantity;
 
 quand total {
     affiche "nouveau total :", total;
 }
 
-quantite = 5;
+quantity = 5;
 ```
 
 Read the generated code:
