@@ -10,11 +10,11 @@ Butterfly is a **reactive** language. Next to ordinary variables, you declare ce
 let price = 20;
 let quantity = 3;
 bind total = price * quantity;
-print "total :", total;
+print "total:", total;
 quantity = 5;
-print "total :", total;
+print "total:", total;
 price = price + 5;
-print "total :", total;
+print "total:", total;
 ```
 
 Nobody recomputed `total`. As soon as a source changes, every derived cell that depends on it is updated, exactly once each and in the right order. You cannot assign a value to a derived cell: that would contradict its formula.
@@ -28,7 +28,7 @@ let temperature = 18;
 bind hot = temperature > 25;
 
 when hot {
-    print "il fait chaud :", hot;
+    print "it is hot:", hot;
 }
 
 temperature = 22;
@@ -54,7 +54,7 @@ bind c = a * 10;
 bind d = b + c;
 
 when d {
-    print "d vaut maintenant", d;
+    print "d is now", d;
 }
 
 a = 2;
@@ -97,16 +97,14 @@ print 1 < 2 < 3;
 
 ## Conditions and loops
 
-`if` is "if", `else` is "else", and `for i in 1..4` is "for i in 1..4".
-
 ```fly run
 let grade = 14;
 if grade >= 16 {
-    print "très bien";
+    print "very good";
 } else if grade >= 12 {
-    print "bien";
+    print "good";
 } else {
-    print "à revoir";
+    print "needs work";
 }
 
 for i in 1..4 {
@@ -160,9 +158,9 @@ b = 2;
 A runtime error gives the line **of the Butterfly program** (not the one of the generated Python), and what was already printed is kept:
 
 ```fly run
-print "début";
+print "start";
 print 1 / 0;
-print "fin";
+print "end";
 ```
 
 ## What Butterfly does not do

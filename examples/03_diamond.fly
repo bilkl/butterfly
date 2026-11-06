@@ -6,7 +6,7 @@ bind c = a * 10;
 bind d = b + c;
 
 when d {
-    print "d vaut maintenant", d;
+    print "d is now", d;
 }
 
 print d;

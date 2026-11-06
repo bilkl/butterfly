@@ -19,11 +19,11 @@ let quantity = 3;
 bind total = price * quantity;
 
 when total {
-    print "nouveau total :", total;
+    print "new total:", total;
 }
 
-quantity = 5;       # prints: nouveau total : 100
-price = price + 5;    # prints: nouveau total : 125
+quantity = 5;       # prints: new total: 100
+price = price + 5;  # prints: new total: 125
 ```
 
 ## Lexicon
@@ -161,7 +161,7 @@ Division or modulo by zero, an operand of the wrong type, a non-boolean conditio
 
 ## Example programs
 
-Five programs, in `exemples/`, with their exact output (same name, `.attendu` extension, "attendu" meaning "expected").
+Five programs, in `examples/`, with their exact output (same name, `.expected` extension).
 
 | File | What it shows |
 |---|---|

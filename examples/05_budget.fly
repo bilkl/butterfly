@@ -10,15 +10,15 @@ bind rate = expenses * 100 / salary;
 
 when remaining {
     if remaining < 0 {
-        print "déficit de", abs(remaining);
+        print "deficit of", abs(remaining);
     } else if remaining < 200 {
-        print "juste, il reste", remaining;
+        print "tight, remaining", remaining;
     } else {
-        print "confortable, il reste", remaining;
+        print "comfortable, remaining", remaining;
     }
 }
 
-print "départ :", expenses, remaining, rate;
+print "start:", expenses, remaining, rate;
 groceries = groceries + 400;
 leisure = 0;
 leisure = 0;
@@ -26,6 +26,6 @@ rent = rent + 600;
 salary = salary + 150;
 
 for month in 1..4 {
-    print "mois", month, ":", remaining * month;
+    print "month", month, ":", remaining * month;
 }
-print "taux final :", rate;
+print "final rate:", rate;

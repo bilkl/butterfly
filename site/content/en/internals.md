@@ -1,6 +1,6 @@
 # Under the hood
 
-Butterfly uses no parser-generator tool: the whole compilation chain is written by hand, in Python.
+Butterfly uses no parser-generator tool: every stage of the compilation chain is written in Python.
 
 ```text
 source text → lexer → tokens → parser → tree → analysis → checked tree → generator → Python
@@ -13,7 +13,7 @@ Each stage has its input, its output and its tests. All the examples on this pag
 **Module** `butterfly/lexer.py`. It splits the text into "words" (the *tokens*), with their position. It is a **generator**: it reads the source only as it goes, so the tokens read before a lexical error are already available.
 
 ```fly tokens
-let total = price * 2; # un commentaire
+let total = price * 2; # a comment
 ```
 
 It always reads the longest possible token: `<=` is a single token, and `1..5` gives three tokens (`1`, `..`, `5`), which is why decimal numbers do not exist.
@@ -30,7 +30,7 @@ The `*` is deeper in the tree than the `+`: that is what gives it priority. The 
 
 ## 3. Semantic analysis: what the grammar cannot see
 
-**Module** `butterfly/semantique.py`. It checks names (declared before use, never hidden), assignments (never to a derived cell), observers and function calls. It also produces what the generator needs: the top-level cells and, for each derived cell, the cells named in its formula.
+**Module** `butterfly/semantics.py`. It checks names (declared before use, never hidden), assignments (never to a derived cell), observers and function calls. It also produces what the generator needs: the top-level cells and, for each derived cell, the cells named in its formula.
 
 ```fly analyse
 let a = 1;
@@ -41,7 +41,7 @@ bind d = c * b;
 
 ## 4. The generator: from the tree to Python
 
-**Module** `butterfly/generateur.py`. The key point is **propagation**. Butterfly embeds no reactive engine at run time: for each assignment to a source, the compiler works out the ordered list of derived cells to recompute and of observers to notify, then writes the code that does it.
+**Module** `butterfly/generator.py`. The key point is **propagation**. Butterfly embeds no reactive engine at run time: for each assignment to a source, the compiler works out the ordered list of derived cells to recompute and of observers to notify, then writes the code that does it.
 
 ```fly python
 let price = 20;
@@ -49,7 +49,7 @@ let quantity = 3;
 bind total = price * quantity;
 
 when total {
-    print "nouveau total :", total;
+    print "new total:", total;
 }
 
 quantity = 5;
@@ -58,9 +58,9 @@ quantity = 5;
 Read the generated code:
 
 - each derived cell has a `_calc_…` function that is called again at each recomputation;
-- before the assignment, the value of the observed cells is set aside (`_av_total`, where `av` stands for "avant", before);
+- before the assignment, the value of the observed cells is set aside (`_old_total`);
 - after the assignment, the affected derived cells are recomputed **in the order of their declaration**, which is a valid topological order since names are declared before use;
-- finally, `_change` compares the old and the new value, and the observer `_obs_0` is called only if it changed.
+- finally, `_changed` compares the old and the new value, and the observer `_obs_0` is called only if it changed.
 
 All variables are prefixed with `v_`, and texts are written with `repr`: no name and no text of the program can ever produce Python that the compiler did not plan for.
 
@@ -72,7 +72,7 @@ All variables are prefixed with `v_`, and texts are written with `repr`: no name
 
 | Module | Role |
 |---|---|
-| `compilateur.py` | the facade (`compiler`, `transpiler`, `executer`): everything else builds on it |
+| `compiler.py` | the facade (`analyze_program`, `transpile`, `execute`): everything else builds on it |
 | `cli.py` | the command line, with its exit codes |
 | `repl.py` | the interactive session |
 | `formatter.py` | the canonical layout, comments and blank lines kept |
@@ -94,7 +94,7 @@ The **REPL** has no state to serialise. It keeps the text of the successful entr
 
 ## The tests
 
-The repository has more than 360 tests, one file per stage of the chain. Three ideas make them useful:
+The repository has more than 380 tests, one file per stage of the chain. Three ideas make them useful:
 
 - the **specification is executable**: a test reads its table of errors and checks each message;
 - **every example** is run and its output compared to the expected output, including after going through the formatter;

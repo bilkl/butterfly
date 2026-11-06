@@ -2,8 +2,8 @@
 let price = 20;
 let quantity = 3;
 bind total = price * quantity;
-print "total :", total;
+print "total:", total;
 quantity = 5;
-print "total :", total;
+print "total:", total;
 price = price + 5;
-print "total :", total;
+print "total:", total;

@@ -1,6 +1,21 @@
 // The playground: the real Butterfly compiler, run in the browser by Pyodide
 // (Python compiled to WebAssembly).
 (function () {
+  var LANG = document.documentElement.lang === "fr" ? "fr" : "en";
+  var TXT = {
+    en: {
+      myProgram: "(my program)",
+      noPyodide: "Could not load Python (Pyodide): check your connection, then reload the page.",
+      ready: "Ready.", failed: "Loading failed: ", errorsIn: " error(s) in the program.",
+      printedNothing: "(the program printed nothing)", runtimeError: "Runtime error.", done: "Done.",
+    },
+    fr: {
+      myProgram: "(mon programme)",
+      noPyodide: "Impossible de charger Python (Pyodide) : vérifiez la connexion, puis rechargez la page.",
+      ready: "Prêt.", failed: "Le chargement a échoué : ", errorsIn: " erreur(s) dans le programme.",
+      printedNothing: "(le programme n'a rien affiché)", runtimeError: "Erreur d'exécution.", done: "Exécuté.",
+    },
+  }[LANG];
   var editor = document.getElementById("editeur");
   if (!editor) return;
 
@@ -14,12 +29,12 @@
   // --- Picking an example, and sharing through the address (#code=...) ----------
   var empty = document.createElement("option");
   empty.value = "";
-  empty.textContent = "(my program)";
+  empty.textContent = TXT.myProgram;
   picker.appendChild(empty);
   examples.forEach(function (example, i) {
     var option = document.createElement("option");
     option.value = String(i);
-    option.textContent = example.titre + " : " + example.description;
+    option.textContent = example.title + " : " + example.description;
     picker.appendChild(option);
   });
 
@@ -84,23 +99,23 @@
   }
 
   if (typeof loadPyodide !== "function") {
-    fail("Could not load Python (Pyodide): check your connection, then reload the page.");
+    fail(TXT.noPyodide);
     return;
   }
 
   loadPyodide()
     .then(function (pyodide) {
-      return fetch("butterfly.zip")
+      return fetch((document.body.dataset.root || "") + "butterfly.zip")
         .then(function (response) { return response.arrayBuffer(); })
         .then(function (zip) {
           pyodide.unpackArchive(zip, "zip");
           pyodide.runPython(SCRIPT);
           runPython = pyodide.globals.get("run");
           runButton.disabled = false;
-          status.textContent = "Ready.";
+          status.textContent = TXT.ready;
         });
     })
-    .catch(function (error) { fail("Loading failed: " + error); });
+    .catch(function (error) { fail(TXT.failed + error); });
 
   function runProgram() {
     if (!runPython) return;
@@ -108,7 +123,7 @@
     if (!result.ok) {
       output.textContent = result.errors.join("\n");
       pythonOut.textContent = "";
-      status.textContent = result.errors.length + " error(s) in the program.";
+      status.textContent = result.errors.length + TXT.errorsIn;
       showTab(true);
       return;
     }
@@ -117,9 +132,9 @@
       var before = text.replace(/\n$/, "");
       text = (before ? before + "\n" : "") + result.error;
     }
-    output.textContent = text || "(the program printed nothing)";
+    output.textContent = text || TXT.printedNothing;
     pythonOut.textContent = result.python;
-    status.textContent = result.error ? "Runtime error." : "Done.";
+    status.textContent = result.error ? TXT.runtimeError : TXT.done;
     showTab(true);
   }
   runButton.addEventListener("click", runProgram);

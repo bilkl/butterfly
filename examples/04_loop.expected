@@ -1,6 +1,6 @@
-impair 1 1 0
-pair 2 4 0
-seuil dépassé
-impair 3 9 1
-pair 4 16 2
+odd 1 1 0
+even 2 4 0
+threshold exceeded
+odd 3 9 1
+even 4 16 2
 10 2 true

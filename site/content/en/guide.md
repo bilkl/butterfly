@@ -25,8 +25,8 @@ If you would rather install nothing, the [sandbox](playground.html) runs Butterf
 Write this in a file named `hello.fly`:
 
 ```fly run
-let name = "monde";
-print "Bonjour,", name;
+let name = "world";
+print "Hello,", name;
 ```
 
 Then run it:

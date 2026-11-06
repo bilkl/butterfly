@@ -1,16 +1,17 @@
 <!doctype html>
-<html lang="en">
+<html lang="@@LANG@@">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>@@TITRE@@</title>
   <meta name="description" content="@@DESCRIPTION@@">
   <meta name="color-scheme" content="light dark">
-  <link rel="icon" href="static/favicon.svg" type="image/svg+xml">
+@@ALTERNATE@@
+  <link rel="icon" href="@@ROOT@@static/favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=JetBrains+Mono:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap">
-  <link rel="stylesheet" href="static/style.css">
+  <link rel="stylesheet" href="@@ROOT@@static/style.css">
   <script>
     try {
       var theme = localStorage.getItem("theme");
@@ -18,17 +19,18 @@
     } catch (e) {}
   </script>
 </head>
-<body class="@@CLASSE@@">
-  <a class="skip" href="#contenu">Skip to content</a>
+<body class="@@CLASSE@@" data-root="@@ROOT@@">
+  <a class="skip" href="#contenu">@@T_SKIP@@</a>
   <header class="bar">
-    <a class="brand" href="index.html" aria-label="Butterfly, home">
-      <img src="static/favicon.svg" alt="" width="30" height="30">
+    <a class="brand" href="index.html" aria-label="@@T_HOME_ARIA@@">
+      <img src="@@ROOT@@static/favicon.svg" alt="" width="30" height="30">
       <span>Butterfly</span>
     </a>
-    <nav class="nav" aria-label="Site pages">
+    <nav class="nav" aria-label="@@T_NAV_ARIA@@">
 @@NAV@@
     </nav>
-    <button class="theme" type="button" aria-label="Switch theme" title="Switch theme">
+    @@LANG_SWITCH@@
+    <button class="theme" type="button" aria-label="@@T_THEME@@" title="@@T_THEME@@">
       <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z" fill="currentColor"/></svg>
     </button>
   </header>
@@ -36,9 +38,9 @@
 @@CORPS@@
   </main>
   <footer class="pied">
-    <p>Butterfly, a reactive language transpiled to Python. Project of the Advanced Python course.</p>
-    <p><a href="@@DEPOT@@">Source code on GitHub</a></p>
+    <p>@@T_FOOTER@@</p>
+    <p><a href="@@DEPOT@@">@@T_SOURCE@@</a></p>
   </footer>
-  <script src="static/app.js"></script>
+  <script src="@@ROOT@@static/app.js"></script>
 </body>
 </html>

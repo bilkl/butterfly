@@ -10,18 +10,18 @@ let quantity = 3;
 bind total = price * quantity;     # total is ALWAYS price * quantity
 
 when total {                    # runs every time total changes
-    print "nouveau total :", total;
+    print "new total:", total;
 }
 
-quantity = 5;                    # prints: nouveau total : 100
-price = price + 5;                 # prints: nouveau total : 125
+quantity = 5;                    # prints: new total: 100
+price = price + 5;                 # prints: new total: 125
 ```
 
 - `let` creates a source cell, which can be modified.
 - `bind` creates a derived cell, always equal to its formula.
 - `when` creates an observer, run when the value of a cell changes.
 
-The website (guide, reference, examples and an in-browser sandbox): **https://xbkh.github.io/butterfly/**
+The website, in English and in French (guide, reference, examples and an in-browser sandbox): **https://xbkh.github.io/butterfly/** (French: [`/fr/`](https://xbkh.github.io/butterfly/fr/index.html))
 
 The full specification is in [`specification.md`](specification.md).
 
@@ -82,7 +82,7 @@ An example configuration is in [`mcp.example.json`](mcp.example.json).
 ## Tests and quality
 
 ```bash
-uv run pytest            # 385 tests
+uv run pytest            # 419 tests
 uv run mypy butterfly butterfly_server tests   # strict typing
 uv run ruff check .      # style
 ```

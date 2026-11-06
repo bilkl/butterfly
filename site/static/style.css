@@ -128,6 +128,17 @@ a:hover { text-decoration-thickness: 2px; }
   width: 2.2rem; height: 2.2rem; border-radius: 50%; display: grid; place-items: center; cursor: pointer;
 }
 .theme:hover { border-color: var(--accent); }
+.lang {
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  height: 2.2rem; padding: 0 0.8rem; border-radius: 1.1rem; display: inline-grid; place-items: center;
+  font-family: var(--font-display); font-size: 0.9rem; font-weight: 700; text-decoration: none;
+}
+.lang:hover { border-color: var(--accent); }
+
+@media (max-width: 1100px) {
+  .bar { gap: 0.75rem; }
+  .nav { gap: 0.15rem 0.7rem; font-size: 0.9rem; }
+}
 
 @media (max-width: 760px) {
   .bar { flex-wrap: wrap; row-gap: 0.4rem; }
@@ -310,3 +321,8 @@ pre.repl { background: var(--sunken); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
+
+/* French labels of the generated content */
+html[lang="fr"] pre.sortie::before { content: "sortie"; }
+html[lang="fr"] pre.sortie.erreur::before { content: "erreur"; }
+html[lang="fr"] .journal:empty::before { content: "L'observateur n'a encore rien affiché."; }

@@ -1,0 +1,34 @@
+<section class="atelier">
+  <h1>Essayer Butterfly</h1>
+  <p class="chapeau">
+    Écrivez un programme et exécutez-le ici : le vrai compilateur de Butterfly
+    tourne dans votre navigateur, grâce à Python compilé en WebAssembly.
+  </p>
+
+  <div class="atelier-barre">
+    <label for="choix-exemple">Partir d'un exemple</label>
+    <select id="choix-exemple"></select>
+    <button type="button" class="bouton" id="executer" disabled>Exécuter</button>
+    <span class="statut" id="statut" role="status">Chargement de Python, environ 10 Mo…</span>
+  </div>
+
+  <div class="atelier-grille">
+    <div class="atelier-colonne">
+      <label for="editeur">Programme</label>
+      <textarea id="editeur" spellcheck="false" autocapitalize="off" autocomplete="off" rows="18"></textarea>
+      <p class="aide">Ctrl + Entrée pour exécuter.</p>
+    </div>
+    <div class="atelier-colonne">
+      <div class="onglets" role="tablist" aria-label="Résultat">
+        <button type="button" role="tab" aria-selected="true" id="onglet-sortie" aria-controls="panneau-sortie">Sortie</button>
+        <button type="button" role="tab" aria-selected="false" id="onglet-python" aria-controls="panneau-python">Python généré</button>
+      </div>
+      <pre class="code sortie" id="panneau-sortie" role="tabpanel" aria-labelledby="onglet-sortie" aria-live="polite"><code>La sortie apparaîtra ici.</code></pre>
+      <pre class="code" id="panneau-python" role="tabpanel" aria-labelledby="onglet-python" hidden><code></code></pre>
+    </div>
+  </div>
+</section>
+
+<script type="application/json" id="exemples">@@EXEMPLES_JSON@@</script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script src="@@ROOT@@static/playground.js"></script>

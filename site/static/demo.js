@@ -3,6 +3,7 @@
 // derived cell exactly once, in order, then notifies the observer only if the
 // value of d has changed.
 (function () {
+  var FR = document.documentElement.lang === "fr";
   var root = document.getElementById("demo");
   if (!root) return;
 
@@ -47,7 +48,7 @@
     next = Math.max(-99, Math.min(99, Math.round(next)));
     input.value = String(next);
     if (next === values.a) {
-      line("a is already " + next + ": nothing changes, the observer stays silent.", true);
+      line(FR ? "a vaut déjà " + next + " : rien ne change, l'observateur reste silencieux." : "a is already " + next + ": nothing changes, the observer stays silent.", true);
       return;
     }
     var beforeD = values.d;
@@ -66,7 +67,7 @@
     });
     after(1050, function () {
       ["lien-ab", "lien-ac", "lien-bd", "lien-cd"].forEach(function (id) { link(id, false); });
-      if (values.d !== beforeD) line("d vaut maintenant " + values.d);
+      if (values.d !== beforeD) line("d is now " + values.d);
     });
   }
 

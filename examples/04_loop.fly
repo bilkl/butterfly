@@ -4,21 +4,21 @@ bind average = sum / 4;
 bind big = sum > 5;
 
 when big {
-    print "seuil dépassé";
+    print "threshold exceeded";
 }
 
 for i in 1..5 {
     let square = i * i;
     sum = sum + i;
     if i % 2 == 0 {
-        print "pair", i, square, average;
+        print "even", i, square, average;
     } else {
-        print "impair", i, square, average;
+        print "odd", i, square, average;
     }
 }
 
 for j in 3..3 {
-    print "jamais";
+    print "never";
 }
 
 print sum, average, big;
