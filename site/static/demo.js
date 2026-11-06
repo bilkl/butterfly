@@ -3,74 +3,74 @@
 // derived cell exactly once, in order, then notifies the observer only if the
 // value of d has changed.
 (function () {
-  var racine = document.getElementById("demo");
-  if (!racine) return;
+  var root = document.getElementById("demo");
+  if (!root) return;
 
-  var entree = document.getElementById("entree-a");
-  var journal = document.getElementById("journal");
-  var reduit = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var etat = { a: 1 };
+  var input = document.getElementById("entree-a");
+  var log = document.getElementById("journal");
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var state = { a: 1 };
 
-  function calculer(a) {
+  function compute(a) {
     var b = a + 1;
     var c = a * 10;
     return { a: a, b: b, c: c, d: b + c };
   }
-  var valeurs = calculer(etat.a);
+  var values = compute(state.a);
 
-  function afficher(nom) {
-    document.getElementById("val-" + nom).textContent = String(valeurs[nom]);
+  function show(name) {
+    document.getElementById("val-" + name).textContent = String(values[name]);
   }
-  function eclat(nom) {
-    var cellule = document.getElementById("cell-" + nom);
-    cellule.classList.remove("flash");
-    void cellule.getBoundingClientRect(); // restart the animation
-    cellule.classList.add("flash");
+  function flash(name) {
+    var cell = document.getElementById("cell-" + name);
+    cell.classList.remove("flash");
+    void cell.getBoundingClientRect(); // restart the animation
+    cell.classList.add("flash");
   }
-  function lien(id, actif) {
-    document.getElementById(id).classList.toggle("actif", actif);
+  function link(id, active) {
+    document.getElementById(id).classList.toggle("actif", active);
   }
-  function ligne(texte, silence) {
+  function line(text, quiet) {
     var li = document.createElement("li");
-    li.textContent = texte;
-    if (silence) li.className = "silence";
-    journal.appendChild(li);
-    journal.scrollTop = journal.scrollHeight;
+    li.textContent = text;
+    if (quiet) li.className = "silence";
+    log.appendChild(li);
+    log.scrollTop = log.scrollHeight;
   }
-  function apres(delai, fonction) {
-    if (reduit) fonction();
-    else window.setTimeout(fonction, delai);
+  function after(delay, fn) {
+    if (reduced) fn();
+    else window.setTimeout(fn, delay);
   }
 
-  function changer(nouveau) {
-    if (!Number.isFinite(nouveau)) return;
-    nouveau = Math.max(-99, Math.min(99, Math.round(nouveau)));
-    entree.value = String(nouveau);
-    if (nouveau === valeurs.a) {
-      ligne("a is already " + nouveau + ": nothing changes, the observer stays silent.", true);
+  function change(next) {
+    if (!Number.isFinite(next)) return;
+    next = Math.max(-99, Math.min(99, Math.round(next)));
+    input.value = String(next);
+    if (next === values.a) {
+      line("a is already " + next + ": nothing changes, the observer stays silent.", true);
       return;
     }
-    var avantD = valeurs.d;
-    var suivant = calculer(nouveau);
-    valeurs.a = suivant.a;
-    afficher("a"); eclat("a");
-    lien("lien-ab", true); lien("lien-ac", true);
-    apres(350, function () {
-      valeurs.b = suivant.b; valeurs.c = suivant.c;
-      afficher("b"); afficher("c"); eclat("b"); eclat("c");
-      lien("lien-bd", true); lien("lien-cd", true);
+    var beforeD = values.d;
+    var following = compute(next);
+    values.a = following.a;
+    show("a"); flash("a");
+    link("lien-ab", true); link("lien-ac", true);
+    after(350, function () {
+      values.b = following.b; values.c = following.c;
+      show("b"); show("c"); flash("b"); flash("c");
+      link("lien-bd", true); link("lien-cd", true);
     });
-    apres(700, function () {
-      valeurs.d = suivant.d;
-      afficher("d"); eclat("d");
+    after(700, function () {
+      values.d = following.d;
+      show("d"); flash("d");
     });
-    apres(1050, function () {
-      ["lien-ab", "lien-ac", "lien-bd", "lien-cd"].forEach(function (id) { lien(id, false); });
-      if (valeurs.d !== avantD) ligne("d vaut maintenant " + valeurs.d);
+    after(1050, function () {
+      ["lien-ab", "lien-ac", "lien-bd", "lien-cd"].forEach(function (id) { link(id, false); });
+      if (values.d !== beforeD) line("d vaut maintenant " + values.d);
     });
   }
 
-  document.getElementById("plus").addEventListener("click", function () { changer(valeurs.a + 1); });
-  document.getElementById("moins").addEventListener("click", function () { changer(valeurs.a - 1); });
-  entree.addEventListener("change", function () { changer(Number(entree.value)); });
+  document.getElementById("plus").addEventListener("click", function () { change(values.a + 1); });
+  document.getElementById("moins").addEventListener("click", function () { change(values.a - 1); });
+  input.addEventListener("change", function () { change(Number(input.value)); });
 })();
