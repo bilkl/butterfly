@@ -12,8 +12,8 @@ from pathlib import Path
 import pytest
 from mcp import Client
 
-RACINE = Path(__file__).resolve().parent.parent
-sys.path.insert(0, str(RACINE))
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
 
 
 @pytest.fixture
@@ -24,7 +24,7 @@ def anyio_backend() -> str:
 @pytest.fixture
 async def client() -> AsyncIterator[Client]:
     """Un client MCP connecté au serveur Butterfly **dans le même processus**."""
-    from serveur_butterfly.serveur import mcp
+    from butterfly_server.server import mcp
 
-    async with Client(mcp) as connecte:
-        yield connecte
+    async with Client(mcp) as connected:
+        yield connected

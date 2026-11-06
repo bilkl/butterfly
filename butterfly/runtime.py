@@ -9,74 +9,80 @@ Les fonctions commencent par ``_`` pour ne jamais entrer en conflit avec un nom
 de variable du programme (toutes les variables sont préfixées par ``v_``).
 """
 
-from butterfly.erreurs import ErreurExecution
+from butterfly.errors import ExecutionError
 
 
-def _type(valeur: object) -> str:
-    if isinstance(valeur, bool):
-        return "booléen"
-    if isinstance(valeur, int):
-        return "entier"
-    return "texte"
+def _type(value: object) -> str:
+    if isinstance(value, bool):
+        return "boolean"
+    if isinstance(value, int):
+        return "integer"
+    return "text"
 
 
-def _texte(valeur: object) -> str:
-    """Comment une valeur s'affiche : ``vrai``, ``faux``, un entier ou un texte."""
-    if valeur is True:
-        return "vrai"
-    if valeur is False:
-        return "faux"
-    return str(valeur)
+def _a(value: object) -> str:
+    """The type of a value with its article: « an integer », « a text »."""
+    name = _type(value)
+    return f"an {name}" if name == "integer" else f"a {name}"
 
 
-def _affiche(*valeurs: object) -> None:
-    print(" ".join(_texte(valeur) for valeur in valeurs))
+def _text(value: object) -> str:
+    """How a value is printed: ``true``, ``false``, an integer or a text."""
+    if value is True:
+        return "true"
+    if value is False:
+        return "false"
+    return str(value)
+
+
+def _print(*values: object) -> None:
+    print(" ".join(_text(value) for value in values))
 
 
 # --- Égalité -----------------------------------------------------------------
 
 
-def _egal(a: object, b: object) -> bool:
+def _eq(a: object, b: object) -> bool:
     """Deux valeurs de types différents sont toujours différentes
     (en Python, ``True == 1``, mais en Butterfly ``vrai == 1`` est faux)."""
     return type(a) is type(b) and a == b
 
 
-def _change(avant: object, apres: object) -> bool:
+def _changed(before: object, after: object) -> bool:
     """La valeur d'une cellule a-t-elle changé ? (sert à déclencher ``quand``)"""
-    return not _egal(avant, apres)
+    return not _eq(before, after)
 
 
 # --- Contrôles de type -------------------------------------------------------
 
 
-def _booleen(valeur: object, ligne: int) -> bool:
-    if type(valeur) is not bool:
-        raise ErreurExecution(f"booléen attendu, {_type(valeur)} trouvé", ligne)
-    return valeur
+def _boolean(value: object, line: int) -> bool:
+    if type(value) is not bool:
+        raise ExecutionError(f"boolean expected, {_type(value)} found", line)
+    return value
 
 
-def _condition(valeur: object, ligne: int) -> bool:
-    if type(valeur) is not bool:
-        raise ErreurExecution(
-            f"la condition de 'si' doit être un booléen, pas un {_type(valeur)}", ligne
+def _condition(value: object, line: int) -> bool:
+    if type(value) is not bool:
+        raise ExecutionError(
+            f"the condition of 'if' must be a boolean, not {_a(value)}", line
         )
-    return valeur
+    return value
 
 
-def _borne(valeur: object, ligne: int) -> int:
-    if type(valeur) is not int:
-        raise ErreurExecution(
-            f"les bornes de 'pour' doivent être des entiers, pas un {_type(valeur)}",
-            ligne,
+def _bound(value: object, line: int) -> int:
+    if type(value) is not int:
+        raise ExecutionError(
+            f"the bounds of 'for' must be integers, not {_a(value)}",
+            line,
         )
-    return valeur
+    return value
 
 
-def _deux_entiers(symbole: str, a: object, b: object, ligne: int) -> tuple[int, int]:
+def _two_integers(symbol: str, a: object, b: object, line: int) -> tuple[int, int]:
     if type(a) is not int or type(b) is not int:
-        raise ErreurExecution(
-            f"'{symbole}' attend deux entiers, pas {_type(a)} et {_type(b)}", ligne
+        raise ExecutionError(
+            f"'{symbol}' expects two integers, not {_type(a)} and {_type(b)}", line
         )
     return a, b
 
@@ -84,93 +90,93 @@ def _deux_entiers(symbole: str, a: object, b: object, ligne: int) -> tuple[int, 
 # --- Arithmétique ------------------------------------------------------------
 
 
-def _plus(a: object, b: object, ligne: int) -> int | str:
+def _add(a: object, b: object, line: int) -> int | str:
     if type(a) is int and type(b) is int:
         return a + b
     if type(a) is str and type(b) is str:
         return a + b
-    raise ErreurExecution(
-        f"'+' attend deux entiers ou deux textes, pas {_type(a)} et {_type(b)}", ligne
+    raise ExecutionError(
+        f"'+' expects two integers or two texts, not {_type(a)} and {_type(b)}", line
     )
 
 
-def _moins(a: object, b: object, ligne: int) -> int:
-    x, y = _deux_entiers("-", a, b, ligne)
+def _sub(a: object, b: object, line: int) -> int:
+    x, y = _two_integers("-", a, b, line)
     return x - y
 
 
-def _fois(a: object, b: object, ligne: int) -> int:
-    x, y = _deux_entiers("*", a, b, ligne)
+def _mul(a: object, b: object, line: int) -> int:
+    x, y = _two_integers("*", a, b, line)
     return x * y
 
 
-def _divise(a: object, b: object, ligne: int) -> int:
-    x, y = _deux_entiers("/", a, b, ligne)
+def _div(a: object, b: object, line: int) -> int:
+    x, y = _two_integers("/", a, b, line)
     if y == 0:
-        raise ErreurExecution("division par zéro", ligne)
+        raise ExecutionError("division by zero", line)
     return x // y
 
 
-def _reste(a: object, b: object, ligne: int) -> int:
-    x, y = _deux_entiers("%", a, b, ligne)
+def _mod(a: object, b: object, line: int) -> int:
+    x, y = _two_integers("%", a, b, line)
     if y == 0:
-        raise ErreurExecution("modulo par zéro", ligne)
+        raise ExecutionError("modulo by zero", line)
     return x % y
 
 
-def _neg(a: object, ligne: int) -> int:
+def _neg(a: object, line: int) -> int:
     if type(a) is not int:
-        raise ErreurExecution(f"'-' attend un entier, pas un {_type(a)}", ligne)
+        raise ExecutionError(f"'-' expects an integer, not {_a(a)}", line)
     return -a
 
 
 # --- Comparaisons ------------------------------------------------------------
 
 
-def _comparable(symbole: str, a: object, b: object, ligne: int) -> None:
-    memes_types = type(a) is type(b) and type(a) in (int, str)
-    if not memes_types:
-        raise ErreurExecution(
-            f"'{symbole}' compare deux entiers ou deux textes, "
-            f"pas {_type(a)} et {_type(b)}",
-            ligne,
+def _comparable(symbol: str, a: object, b: object, line: int) -> None:
+    same_types = type(a) is type(b) and type(a) in (int, str)
+    if not same_types:
+        raise ExecutionError(
+            f"'{symbol}' compares two integers or two texts, "
+            f"not {_type(a)} and {_type(b)}",
+            line,
         )
 
 
-def _inf(a: int | str, b: int | str, ligne: int) -> bool:
-    _comparable("<", a, b, ligne)
+def _lt(a: int | str, b: int | str, line: int) -> bool:
+    _comparable("<", a, b, line)
     return a < b  # type: ignore[operator]
 
 
-def _inf_egal(a: int | str, b: int | str, ligne: int) -> bool:
-    _comparable("<=", a, b, ligne)
+def _le(a: int | str, b: int | str, line: int) -> bool:
+    _comparable("<=", a, b, line)
     return a <= b  # type: ignore[operator]
 
 
-def _sup(a: int | str, b: int | str, ligne: int) -> bool:
-    _comparable(">", a, b, ligne)
+def _gt(a: int | str, b: int | str, line: int) -> bool:
+    _comparable(">", a, b, line)
     return a > b  # type: ignore[operator]
 
 
-def _sup_egal(a: int | str, b: int | str, ligne: int) -> bool:
-    _comparable(">=", a, b, ligne)
+def _ge(a: int | str, b: int | str, line: int) -> bool:
+    _comparable(">=", a, b, line)
     return a >= b  # type: ignore[operator]
 
 
 # --- Fonctions prédéfinies ---------------------------------------------------
 
 
-def _min(a: object, b: object, ligne: int) -> int:
-    x, y = _deux_entiers("min", a, b, ligne)
+def _min(a: object, b: object, line: int) -> int:
+    x, y = _two_integers("min", a, b, line)
     return min(x, y)
 
 
-def _max(a: object, b: object, ligne: int) -> int:
-    x, y = _deux_entiers("max", a, b, ligne)
+def _max(a: object, b: object, line: int) -> int:
+    x, y = _two_integers("max", a, b, line)
     return max(x, y)
 
 
-def _abs(a: object, ligne: int) -> int:
+def _abs(a: object, line: int) -> int:
     if type(a) is not int:
-        raise ErreurExecution(f"abs attend un entier, pas un {_type(a)}", ligne)
+        raise ExecutionError(f"abs expects an integer, not {_a(a)}", line)
     return abs(a)

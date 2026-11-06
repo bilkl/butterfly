@@ -1,0 +1,31 @@
+# Monthly budget: expenses that change and an alert on what is left.
+let salary = 2000;
+let rent = 800;
+let groceries = 300;
+let leisure = 150;
+
+bind expenses = rent + groceries + leisure;
+bind remaining = salary - expenses;
+bind rate = expenses * 100 / salary;
+
+when remaining {
+    if remaining < 0 {
+        print "déficit de", abs(remaining);
+    } else if remaining < 200 {
+        print "juste, il reste", remaining;
+    } else {
+        print "confortable, il reste", remaining;
+    }
+}
+
+print "départ :", expenses, remaining, rate;
+groceries = groceries + 400;
+leisure = 0;
+leisure = 0;
+rent = rent + 600;
+salary = salary + 150;
+
+for month in 1..4 {
+    print "mois", month, ":", remaining * month;
+}
+print "taux final :", rate;

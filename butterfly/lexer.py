@@ -7,140 +7,136 @@ demande des tokens. Une erreur lexicale se produit donc au moment où on arrive
 
 from collections.abc import Iterator
 
-from butterfly.erreurs import ErreurLexicale, Position
+from butterfly.errors import LexicalError, Position
 from butterfly.tokens import (
-    MOTS_CLES,
-    SYMBOLES_DOUBLES,
-    SYMBOLES_SIMPLES,
+    DOUBLE_SYMBOLS,
+    KEYWORDS,
+    SINGLE_SYMBOLS,
     Token,
     TypeToken,
 )
 
-CHIFFRES = "0123456789"
+DIGITS = "0123456789"
 ESCAPES = {"n": "\n", '"': '"', "\\": "\\"}
 
 
-class _Lecteur:
+class _Reader:
     """Un curseur dans le source, qui suit la ligne et la colonne."""
 
     def __init__(self, source: str) -> None:
         self.source = source
         self.i = 0
-        self.ligne = 1
-        self.colonne = 1
+        self.line = 1
+        self.column = 1
 
-    def fini(self) -> bool:
+    def finished(self) -> bool:
         return self.i >= len(self.source)
 
-    def car(self, decalage: int = 0) -> str:
+    def char(self, offset: int = 0) -> str:
         """Le caractère courant (ou le suivant, etc.) ; ``""`` après la fin."""
-        j = self.i + decalage
+        j = self.i + offset
         return self.source[j] if j < len(self.source) else ""
 
-    def avancer(self) -> str:
+    def advance(self) -> str:
         c = self.source[self.i]
         self.i += 1
         if c == "\n":
-            self.ligne += 1
-            self.colonne = 1
+            self.line += 1
+            self.column = 1
         else:
-            self.colonne += 1
+            self.column += 1
         return c
 
     def position(self) -> Position:
-        return Position(self.ligne, self.colonne)
+        return Position(self.line, self.column)
 
 
-def tokenize(source: str, *, commentaires: bool = False) -> Iterator[Token]:
+def tokenize(source: str, *, comments: bool = False) -> Iterator[Token]:
     """Produit les tokens de ``source``, terminés par un token ``FIN``.
 
     Avec ``commentaires=True``, les commentaires sont produits (type
     ``COMMENTAIRE``) au lieu d'être ignorés : le formateur en a besoin.
     """
-    lecteur = _Lecteur(source)
-    while not lecteur.fini():
-        c = lecteur.car()
+    reader = _Reader(source)
+    while not reader.finished():
+        c = reader.char()
         if c in " \t\r\n":
-            lecteur.avancer()
+            reader.advance()
             continue
-        pos = lecteur.position()
+        pos = reader.position()
         if c == "#":
-            debut = lecteur.i
-            while not lecteur.fini() and lecteur.car() != "\n":
-                lecteur.avancer()
-            if commentaires:
-                yield Token(TypeToken.COMMENTAIRE, source[debut : lecteur.i], pos)
-        elif c in CHIFFRES:
-            yield _nombre(lecteur, pos)
+            start = reader.i
+            while not reader.finished() and reader.char() != "\n":
+                reader.advance()
+            if comments:
+                yield Token(TypeToken.COMMENT, source[start : reader.i], pos)
+        elif c in DIGITS:
+            yield _number(reader, pos)
         elif c.isalpha() or c == "_":
-            yield _mot(lecteur, pos)
+            yield _word(reader, pos)
         elif c == '"':
-            yield _texte(lecteur, pos)
-        elif c + lecteur.car(1) in SYMBOLES_DOUBLES:
-            double = c + lecteur.car(1)
-            lecteur.avancer()
-            lecteur.avancer()
-            yield Token(SYMBOLES_DOUBLES[double], double, pos)
-        elif c in SYMBOLES_SIMPLES:
-            lecteur.avancer()
-            yield Token(SYMBOLES_SIMPLES[c], c, pos)
+            yield _text(reader, pos)
+        elif c + reader.char(1) in DOUBLE_SYMBOLS:
+            double_symbol = c + reader.char(1)
+            reader.advance()
+            reader.advance()
+            yield Token(DOUBLE_SYMBOLS[double_symbol], double_symbol, pos)
+        elif c in SINGLE_SYMBOLS:
+            reader.advance()
+            yield Token(SINGLE_SYMBOLS[c], c, pos)
         else:
-            raise ErreurLexicale(f"caractère inattendu {c!r}", pos)
-    yield Token(TypeToken.FIN, "", lecteur.position())
+            raise LexicalError(f"unexpected character {c!r}", pos)
+    yield Token(TypeToken.EOF, "", reader.position())
 
 
-def _nombre(lecteur: _Lecteur, pos: Position) -> Token:
-    debut = lecteur.i
-    while lecteur.car() != "" and lecteur.car() in CHIFFRES:
-        lecteur.avancer()
+def _number(reader: _Reader, pos: Position) -> Token:
+    start = reader.i
+    while reader.char() != "" and reader.char() in DIGITS:
+        reader.advance()
     # « 1..5 » est une plage ; un point isolé collé à un nombre est une erreur.
-    if lecteur.car() == "." and lecteur.car(1) != ".":
-        raise ErreurLexicale(
-            "les nombres décimaux n'existent pas : seuls les entiers sont permis",
-            lecteur.position(),
+    if reader.char() == "." and reader.char(1) != ".":
+        raise LexicalError(
+            "decimal numbers do not exist: only integers are allowed",
+            reader.position(),
         )
-    texte = lecteur.source[debut : lecteur.i]
+    text = reader.source[start : reader.i]
     try:
-        valeur = int(texte)
+        value = int(text)
     except ValueError:  # plus de 4300 chiffres : limite de Python
-        raise ErreurLexicale("nombre trop grand", pos) from None
-    return Token(TypeToken.ENTIER, texte, pos, valeur)
+        raise LexicalError("number too large", pos) from None
+    return Token(TypeToken.INTEGER, text, pos, value)
 
 
-def _mot(lecteur: _Lecteur, pos: Position) -> Token:
-    debut = lecteur.i
-    while lecteur.car() != "" and (lecteur.car().isalnum() or lecteur.car() == "_"):
-        lecteur.avancer()
-    texte = lecteur.source[debut : lecteur.i]
-    return Token(MOTS_CLES.get(texte, TypeToken.IDENT), texte, pos)
+def _word(reader: _Reader, pos: Position) -> Token:
+    start = reader.i
+    while reader.char() != "" and (reader.char().isalnum() or reader.char() == "_"):
+        reader.advance()
+    text = reader.source[start : reader.i]
+    return Token(KEYWORDS.get(text, TypeToken.IDENT), text, pos)
 
 
-def _texte(lecteur: _Lecteur, pos: Position) -> Token:
-    debut = lecteur.i
-    lecteur.avancer()  # le guillemet ouvrant
-    morceaux: list[str] = []
+def _text(reader: _Reader, pos: Position) -> Token:
+    start = reader.i
+    reader.advance()  # le guillemet ouvrant
+    pieces: list[str] = []
     while True:
-        c = lecteur.car()
+        c = reader.char()
         if c in ("", "\n"):
-            raise ErreurLexicale(
-                "texte non fermé : il manque le guillemet fermant", pos
-            )
+            raise LexicalError("unclosed text: the closing quote is missing", pos)
         if c == '"':
-            lecteur.avancer()
+            reader.advance()
             break
         if c == "\\":
-            pos_echappement = lecteur.position()
-            lecteur.avancer()
-            suivant = lecteur.car()
-            if suivant not in ESCAPES:
-                raise ErreurLexicale(
-                    f"échappement inconnu '\\{suivant}' (permis : \\\" \\\\ \\n)",
-                    pos_echappement,
+            escape_pos = reader.position()
+            reader.advance()
+            following = reader.char()
+            if following not in ESCAPES:
+                raise LexicalError(
+                    f"unknown escape '\\{following}' (allowed: \\\" \\\\ \\n)",
+                    escape_pos,
                 )
-            morceaux.append(ESCAPES[suivant])
-            lecteur.avancer()
+            pieces.append(ESCAPES[following])
+            reader.advance()
         else:
-            morceaux.append(lecteur.avancer())
-    return Token(
-        TypeToken.TEXTE, lecteur.source[debut : lecteur.i], pos, "".join(morceaux)
-    )
+            pieces.append(reader.advance())
+    return Token(TypeToken.TEXT, reader.source[start : reader.i], pos, "".join(pieces))

@@ -16,4 +16,4 @@ jobs:
       - name: Style
         run: uv run ruff check .
       - name: Typage strict
-        run: uv run mypy butterfly serveur_butterfly tests
+        run: uv run mypy butterfly butterfly_server tests

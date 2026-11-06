@@ -8,50 +8,50 @@ from mcp import Client
 pytestmark = pytest.mark.anyio
 
 
-async def appeler(client: Client, outil: str, source: str) -> dict[str, Any]:
-    resultat = await client.call_tool(outil, {"source": source})
-    assert not resultat.is_error, resultat.content
-    assert resultat.structured_content is not None
-    return dict(resultat.structured_content)
+async def call_tool_(client: Client, tool: str, source: str) -> dict[str, Any]:
+    result = await client.call_tool(tool, {"source": source})
+    assert not result.is_error, result.content
+    assert result.structured_content is not None
+    return dict(result.structured_content)
 
 
 async def test_transpile_renvoie_du_python_valide(client: Client) -> None:
-    reponse = await appeler(
-        client, "transpile", "soit a = 2; lie b = a * 2; affiche b;"
+    response = await call_tool_(
+        client, "transpile", "let a = 2; bind b = a * 2; print b;"
     )
-    assert reponse["ok"] is True
-    assert reponse["erreurs"] == []
-    compile(reponse["python"], "<test>", "exec")
-    assert "v_b = _calc_b()" in reponse["python"]
+    assert response["ok"] is True
+    assert response["errors"] == []
+    compile(response["python"], "<test>", "exec")
+    assert "v_b = _calc_b()" in response["python"]
 
 
 async def test_transpile_d_un_programme_faux_renvoie_les_erreurs(
     client: Client,
 ) -> None:
-    reponse = await appeler(client, "transpile", "affiche x;")
-    assert reponse["ok"] is False
-    assert reponse["python"] is None
-    assert reponse["erreurs"][0]["message"] == "nom 'x' non déclaré"
+    response = await call_tool_(client, "transpile", "print x;")
+    assert response["ok"] is False
+    assert response["python"] is None
+    assert response["errors"][0]["message"] == "name 'x' not declared"
 
 
 async def test_format_renvoie_la_presentation_canonique(client: Client) -> None:
-    reponse = await appeler(client, "format", "soit   a=1;si a>0{affiche a;}")
-    assert reponse["ok"] is True
-    assert reponse["source"] == "soit a = 1;\nsi a > 0 {\n    affiche a;\n}\n"
+    response = await call_tool_(client, "format", "let   a=1;if a>0{print a;}")
+    assert response["ok"] is True
+    assert response["source"] == "let a = 1;\nif a > 0 {\n    print a;\n}\n"
 
 
 async def test_format_conserve_les_commentaires(client: Client) -> None:
-    reponse = await appeler(client, "format", "# titre\nsoit a = 1;   # note\n")
-    assert reponse["source"] == "# titre\nsoit a = 1;  # note\n"
+    response = await call_tool_(client, "format", "# titre\nlet a = 1;   # note\n")
+    assert response["source"] == "# titre\nlet a = 1;  # note\n"
 
 
 async def test_format_n_exige_que_la_syntaxe(client: Client) -> None:
-    reponse = await appeler(client, "format", "affiche inconnu;")
-    assert reponse["ok"] is True  # le sens n'est pas vérifié
+    response = await call_tool_(client, "format", "print inconnu;")
+    assert response["ok"] is True  # le sens n'est pas vérifié
 
 
 async def test_format_d_une_syntaxe_fausse_renvoie_les_erreurs(client: Client) -> None:
-    reponse = await appeler(client, "format", "soit a = ;")
-    assert reponse["ok"] is False
-    assert reponse["source"] is None
-    assert reponse["erreurs"][0]["genre"] == "Erreur de syntaxe"
+    response = await call_tool_(client, "format", "let a = ;")
+    assert response["ok"] is False
+    assert response["source"] is None
+    assert response["errors"][0]["kind"] == "Syntax error"

@@ -1,9 +1,0 @@
-# A derived cell (lie) follows its sources (soit).
-soit price = 20;
-soit quantity = 3;
-lie total = price * quantity;
-affiche "total :", total;
-quantity = 5;
-affiche "total :", total;
-price = price + 5;
-affiche "total :", total;

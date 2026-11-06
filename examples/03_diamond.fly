@@ -1,0 +1,15 @@
+# A dependency diamond: b and c depend on a, d depends on b and c.
+# The observer never sees an intermediate state (b up to date, c not yet).
+let a = 1;
+bind b = a + 1;
+bind c = a * 10;
+bind d = b + c;
+
+when d {
+    print "d vaut maintenant", d;
+}
+
+print d;
+a = 2;
+a = 2;
+a = 5;

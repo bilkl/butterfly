@@ -7,67 +7,67 @@ from pathlib import Path
 
 import pytest
 
-RACINE = Path(__file__).resolve().parent.parent
-DIST = RACINE / "site" / "dist"
+ROOT = Path(__file__).resolve().parent.parent
+DIST = ROOT / "site" / "dist"
 PAGES = [
-    "index", "langage", "guide", "reference", "exemples", "playground", "mcp", "compilateur",
+    "index", "language", "guide", "reference", "examples", "playground", "mcp", "internals",
 ]  # fmt: skip
 
 
 @pytest.fixture(scope="module")
 def site() -> Path:
-    resultat = subprocess.run(
-        [sys.executable, str(RACINE / "site" / "build.py")],
-        capture_output=True, text=True, cwd=RACINE, check=False,
+    result = subprocess.run(
+        [sys.executable, str(ROOT / "site" / "build.py")],
+        capture_output=True, text=True, cwd=ROOT, check=False,
     )  # fmt: skip
-    assert resultat.returncode == 0, resultat.stdout + resultat.stderr
+    assert result.returncode == 0, result.stdout + result.stderr
     return DIST
 
 
 @pytest.mark.parametrize("page", PAGES)
 def test_chaque_page_existe_sans_marqueur_oublie(site: Path, page: str) -> None:
-    contenu = (site / f"{page}.html").read_text(encoding="utf-8")
-    assert "<h1" in contenu
-    assert "@@" not in contenu  # tous les marqueurs ont été remplacés
+    content = (site / f"{page}.html").read_text(encoding="utf-8")
+    assert "<h1" in content
+    assert "@@" not in content  # tous les marqueurs ont été remplacés
 
 
 @pytest.mark.parametrize("page", PAGES)
 def test_les_liens_internes_pointent_vers_des_fichiers_existants(
     site: Path, page: str
 ) -> None:
-    contenu = (site / f"{page}.html").read_text(encoding="utf-8")
-    for lien in re.findall(r'(?:href|src)="([^"#:]+?)(?:#[^"]*)?"', contenu):
-        if lien.startswith(("http", "mailto")):
+    content = (site / f"{page}.html").read_text(encoding="utf-8")
+    for link in re.findall(r'(?:href|src)="([^"#:]+?)(?:#[^"]*)?"', content):
+        if link.startswith(("http", "mailto")):
             continue
-        assert (site / lien).exists(), f"{page}.html : lien cassé vers {lien}"
+        assert (site / link).exists(), f"{page}.html : lien cassé vers {link}"
 
 
 def test_les_exemples_du_texte_montrent_la_vraie_sortie(site: Path) -> None:
-    langage = (site / "langage.html").read_text(encoding="utf-8")
-    assert "total : 60" in langage
-    assert "total : 100" in langage
-    assert "il fait chaud : vrai" in langage
-    assert "division par zéro" in langage
+    language = (site / "language.html").read_text(encoding="utf-8")
+    assert "total : 60" in language
+    assert "total : 100" in language
+    assert "il fait chaud : true" in language
+    assert "division by zero" in language
 
 
 def test_le_code_est_colore_par_le_lexer_du_langage(site: Path) -> None:
-    accueil = (site / "index.html").read_text(encoding="utf-8")
-    assert '<span class="src">soit</span>' in accueil
-    assert '<span class="der">lie</span>' in accueil
-    assert '<span class="obs">quand</span>' in accueil
+    home = (site / "index.html").read_text(encoding="utf-8")
+    assert '<span class="src">let</span>' in home
+    assert '<span class="der">bind</span>' in home
+    assert '<span class="obs">when</span>' in home
 
 
 def test_le_playground_dispose_du_compilateur_en_archive(site: Path) -> None:
     import zipfile
 
     with zipfile.ZipFile(site / "butterfly.zip") as archive:
-        noms = set(archive.namelist())
+        names = set(archive.namelist())
     assert {
-        "butterfly/compilateur.py",
+        "butterfly/compiler.py",
         "butterfly/lexer.py",
         "butterfly/runtime.py",
-    } <= noms
-    assert not any("__pycache__" in nom for nom in noms)
+    } <= names
+    assert not any("__pycache__" in name for name in names)
 
 
 def test_la_page_de_reference_vient_de_la_specification(site: Path) -> None:

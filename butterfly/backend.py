@@ -7,35 +7,35 @@ le générateur existant : c'est le principe ouvert/fermé.
 
 from typing import Protocol
 
-from butterfly.formateur import formater
-from butterfly.generateur import generer_python
-from butterfly.semantique import Analyse
+from butterfly.formatter import format_source
+from butterfly.generator import generate_python
+from butterfly.semantics import Analysis
 
 
 class Backend(Protocol):
-    nom: str
+    name: str
 
-    def produire(self, analyse: Analyse, source: str) -> str: ...
+    def produce(self, analysis: Analysis, source: str) -> str: ...
 
 
-class BackendPython:
+class PythonBackend:
     """Traduit le programme en Python."""
 
-    nom = "python"
+    name = "python"
 
-    def produire(self, analyse: Analyse, source: str) -> str:
-        return generer_python(analyse)
+    def produce(self, analysis: Analysis, source: str) -> str:
+        return generate_python(analysis)
 
 
-class BackendFormat:
+class FormatBackend:
     """Réécrit le programme en Butterfly canonique."""
 
-    nom = "format"
+    name = "format"
 
-    def produire(self, analyse: Analyse, source: str) -> str:
-        return formater(source)
+    def produce(self, analysis: Analysis, source: str) -> str:
+        return format_source(source)
 
 
 BACKENDS: dict[str, Backend] = {
-    backend.nom: backend for backend in (BackendPython(), BackendFormat())
+    backend.name: backend for backend in (PythonBackend(), FormatBackend())
 }

@@ -6,107 +6,107 @@ from pathlib import Path
 
 from butterfly import __version__
 from butterfly.backend import BACKENDS
-from butterfly.compilateur import compiler, executer, parser
-from butterfly.erreurs import ErreurCompilation, ErreurLexicale, contexte
+from butterfly.compiler import analyze_program, execute, parser
+from butterfly.errors import CompilationError, LexicalError, context
 from butterfly.lexer import tokenize
-from butterfly.noeuds import afficher_arbre
-from butterfly.repl import lancer_repl
+from butterfly.nodes import print_tree
+from butterfly.repl import run_repl
 
-COMMANDES = {
-    "run": "exécute un programme",
-    "check": "vérifie un programme sans l'exécuter",
-    "transpile": "affiche le code Python généré",
-    "format": "réécrit le programme dans sa présentation canonique",
-    "tokens": "affiche les tokens",
-    "ast": "affiche l'arbre syntaxique",
-    "repl": "ouvre une session interactive",
+COMMANDS = {
+    "run": "runs a program",
+    "check": "checks a program without running it",
+    "transpile": "prints the generated Python code",
+    "format": "rewrites the program in its canonical layout",
+    "tokens": "prints the tokens",
+    "ast": "prints the syntax tree",
+    "repl": "opens an interactive session",
 }
 
 
-def lire_source(fichier: str) -> str:
+def read_source(file_path: str) -> str:
     """Lit un fichier (ou l'entrée standard si ``fichier`` vaut ``-``)."""
-    if fichier == "-":
+    if file_path == "-":
         return sys.stdin.read()
-    return Path(fichier).read_text(encoding="utf-8")
+    return Path(file_path).read_text(encoding="utf-8")
 
 
-def construire_parser() -> argparse.ArgumentParser:
-    principal = argparse.ArgumentParser(
+def build_parser() -> argparse.ArgumentParser:
+    main_parser = argparse.ArgumentParser(
         prog="butterfly",
-        description="Butterfly : un langage réactif transpilé en Python.",
+        description="Butterfly: a reactive language transpiled to Python.",
     )
-    principal.add_argument(
+    main_parser.add_argument(
         "--version", action="version", version=f"butterfly {__version__}"
     )
-    sous = principal.add_subparsers(dest="commande", required=True, metavar="commande")
-    for nom, aide in COMMANDES.items():
-        p = sous.add_parser(nom, help=aide, description=aide)
-        if nom != "repl":
+    subparsers = main_parser.add_subparsers(
+        dest="command", required=True, metavar="command"
+    )
+    for name, help_text in COMMANDS.items():
+        p = subparsers.add_parser(name, help=help_text, description=help_text)
+        if name != "repl":
+            p.add_argument("file_path", help=".fly program, or - for standard input")
+        if name == "format":
             p.add_argument(
-                "fichier", help="programme .fly, ou - pour l'entrée standard"
-            )
-        if nom == "format":
-            p.add_argument(
-                "-w", "--ecrire", action="store_true",
-                help="réécrit le fichier au lieu d'afficher le résultat",
+                "-w", "--write", action="store_true",
+                help="rewrites the file instead of printing the result",
             )  # fmt: skip
-    return principal
+    return main_parser
 
 
-def afficher_erreurs(erreur: ErreurCompilation, source: str) -> None:
-    for e in erreur.erreurs:
-        print(contexte(e, source), file=sys.stderr)
+def print_errors(error: CompilationError, source: str) -> None:
+    for e in error.errors:
+        print(context(e, source), file=sys.stderr)
 
 
 def main(argv: list[str] | None = None) -> int:
     """Point d'entrée. Code de retour : 0 si tout va bien, 1 sinon, 2 si le
     fichier est illisible."""
-    arguments = construire_parser().parse_args(argv)
-    if arguments.commande == "repl":
-        lancer_repl()
+    arguments = build_parser().parse_args(argv)
+    if arguments.command == "repl":
+        run_repl()
         return 0
     try:
-        source = lire_source(arguments.fichier)
-    except (OSError, UnicodeDecodeError) as erreur:
+        source = read_source(arguments.file_path)
+    except (OSError, UnicodeDecodeError) as error:
         print(
-            f"butterfly : impossible de lire {arguments.fichier} ({erreur})",
+            f"butterfly: cannot read {arguments.file_path} ({error})",
             file=sys.stderr,
         )
         return 2
     try:
-        return executer_commande(arguments.commande, source, arguments)
-    except ErreurCompilation as erreur:
-        afficher_erreurs(erreur, source)
+        return run_command(arguments.command, source, arguments)
+    except CompilationError as error:
+        print_errors(error, source)
         return 1
 
 
-def executer_commande(commande: str, source: str, arguments: argparse.Namespace) -> int:
-    match commande:
+def run_command(command: str, source: str, arguments: argparse.Namespace) -> int:
+    match command:
         case "run":
-            resultat = executer(source, sys.stdout)
+            result = execute(source, sys.stdout)
             sys.stdout.flush()
-            if resultat.erreur is not None:
-                print(contexte(resultat.erreur, source), file=sys.stderr)
+            if result.error is not None:
+                print(context(result.error, source), file=sys.stderr)
                 return 1
         case "check":
-            compiler(source)
-            print("OK : aucun problème trouvé.")
+            analyze_program(source)
+            print("OK: no problem found.")
         case "transpile":
-            print(BACKENDS["python"].produire(compiler(source), source), end="")
+            print(BACKENDS["python"].produce(analyze_program(source), source), end="")
         case "format":
-            formate = BACKENDS["format"].produire(compiler(source), source)
-            if arguments.ecrire and arguments.fichier != "-":
-                Path(arguments.fichier).write_text(formate, encoding="utf-8")
+            formatted = BACKENDS["format"].produce(analyze_program(source), source)
+            if arguments.write and arguments.file_path != "-":
+                Path(arguments.file_path).write_text(formatted, encoding="utf-8")
             else:
-                print(formate, end="")
+                print(formatted, end="")
         case "tokens":
             try:
                 for token in tokenize(source):  # ceux lus avant l'erreur s'affichent
                     print(token)
-            except ErreurLexicale as erreur:
-                raise ErreurCompilation((erreur,)) from erreur
+            except LexicalError as error:
+                raise CompilationError((error,)) from error
         case "ast":
-            print(afficher_arbre(parser(source)))
+            print(print_tree(parser(source)))
     return 0
 
 

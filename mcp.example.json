@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "butterfly": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "/absolute/path/to/butterfly",
+        "run",
+        "python",
+        "-m",
+        "butterfly_server"
+      ]
+    }
+  }
+}

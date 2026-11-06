@@ -21,3 +21,8 @@ site/dist/
 
 # Réglages locaux de l'éditeur
 .claude/
+
+# Vidéo explicative : seuls les scripts sont versionnés
+video/audio/
+video/sortie/
+video/images/

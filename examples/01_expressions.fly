@@ -1,0 +1,6 @@
+# Expressions, priorities and built-in functions.
+print "bonjour";
+print 2 + 3 * 4, (2 + 3) * 4;
+print 17 / 5, 17 % 5, -17 / 5, -17 % 5;
+print 1 < 2, 2 == 3, not (1 < 2) or 5 >= 5 and 2 < 3;
+print min(4, 9), max(4, 9), abs(-7);

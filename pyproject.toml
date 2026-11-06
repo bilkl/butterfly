@@ -1,7 +1,7 @@
 [project]
 name = "butterfly-lang"
 version = "0.1.0"
-description = "Butterfly : un langage réactif transpilé en Python, avec son serveur MCP"
+description = "Butterfly: a reactive language transpiled to Python, with its MCP server"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
@@ -10,7 +10,7 @@ dependencies = [
 
 [project.scripts]
 butterfly = "butterfly.cli:main"
-butterfly-mcp = "serveur_butterfly.__main__:main"
+butterfly-mcp = "butterfly_server.__main__:main"
 
 [dependency-groups]
 dev = [
@@ -19,13 +19,18 @@ dev = [
     "ruff>=0.8",
     "markdown>=3.6",
 ]
+# Building the explanatory video (uv sync --group video)
+video = [
+    "imageio-ffmpeg>=0.5",
+    "websockets>=13",
+]
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["butterfly", "serveur_butterfly"]
+packages = ["butterfly", "butterfly_server"]
 
 # --- pytest -------------------------------------------------------------------
 
@@ -53,7 +58,9 @@ extend-exclude = ["site/dist"]
 select = ["E", "F", "I", "UP", "B", "SIM"]
 
 [tool.ruff.lint.per-file-ignores]
-# Les tests contiennent des programmes Butterfly écrits en texte : lignes longues permises.
+# Tests contain Butterfly programs written as text: long lines allowed.
 "tests/*" = ["E501"]
-# Le générateur du site contient des phrases françaises en littéraux.
+# The site generator contains long text literals.
 "site/build.py" = ["E501"]
+# Les scripts de la vidéo contiennent des phrases et des programmes en littéraux.
+"video/*.py" = ["E501"]

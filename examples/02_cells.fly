@@ -1,0 +1,9 @@
+# A derived cell (bind) follows its sources (let).
+let price = 20;
+let quantity = 3;
+bind total = price * quantity;
+print "total :", total;
+quantity = 5;
+print "total :", total;
+price = price + 5;
+print "total :", total;

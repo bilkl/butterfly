@@ -9,7 +9,7 @@
     <pre class="code hero-code"><code>@@PROGRAMME_HERO@@</code></pre>
     <p class="actions">
       <a class="bouton" href="playground.html">Try it in the browser</a>
-      <a class="bouton secondaire" href="langage.html">Discover the language</a>
+      <a class="bouton secondaire" href="language.html">Discover the language</a>
     </p>
   </div>
 
@@ -23,22 +23,22 @@
       </g>
       <g class="cellule src" id="cell-a" transform="translate(20 100)">
         <rect width="120" height="50" rx="10"/>
-        <text class="nom" x="14" y="21">soit a</text>
+        <text class="nom" x="14" y="21">let a</text>
         <text class="val" x="14" y="41" id="val-a">1</text>
       </g>
       <g class="cellule der" id="cell-b" transform="translate(200 25)">
         <rect width="130" height="50" rx="10"/>
-        <text class="nom" x="12" y="21">lie b = a + 1</text>
+        <text class="nom" x="12" y="21">bind b = a + 1</text>
         <text class="val" x="12" y="41" id="val-b">2</text>
       </g>
       <g class="cellule der" id="cell-c" transform="translate(200 175)">
         <rect width="130" height="50" rx="10"/>
-        <text class="nom" x="12" y="21">lie c = a * 10</text>
+        <text class="nom" x="12" y="21">bind c = a * 10</text>
         <text class="val" x="12" y="41" id="val-c">10</text>
       </g>
       <g class="cellule der" id="cell-d" transform="translate(380 100)">
         <rect width="64" height="50" rx="10"/>
-        <text class="nom" x="10" y="21">lie d</text>
+        <text class="nom" x="10" y="21">bind d</text>
         <text class="val" x="10" y="41" id="val-d">12</text>
       </g>
     </svg>
@@ -56,21 +56,21 @@
   <h2>Three words to remember</h2>
   <div class="idees-grille">
     <div class="idee src">
-      <h3><code>soit</code>, a source</h3>
+      <h3><code>let</code>, a source</h3>
       <p>A cell you can change whenever you like.</p>
-      <pre class="code"><code><span class="src">soit</span> price = 20;
+      <pre class="code"><code><span class="src">let</span> price = 20;
 price = 25;</code></pre>
     </div>
     <div class="idee der">
-      <h3><code>lie</code>, a derived cell</h3>
+      <h3><code>bind</code>, a derived cell</h3>
       <p>A cell that is always equal to its formula. You never assign it a value.</p>
-      <pre class="code"><code><span class="der">lie</span> total = price * 3;</code></pre>
+      <pre class="code"><code><span class="der">bind</span> total = price * 3;</code></pre>
     </div>
     <div class="idee obs">
-      <h3><code>quand</code>, an observer</h3>
+      <h3><code>when</code>, an observer</h3>
       <p>A block that runs every time the value of a cell changes.</p>
-      <pre class="code"><code><span class="obs">quand</span> total {
-    <span class="kw">affiche</span> total;
+      <pre class="code"><code><span class="obs">when</span> total {
+    <span class="kw">print</span> total;
 }</code></pre>
     </div>
   </div>
@@ -99,7 +99,7 @@ price = 25;</code></pre>
     <li><a href="guide.html">The user guide</a>: install Butterfly, run a program, use the command line and the REPL.</li>
     <li><a href="reference.html">The reference</a>: lexicon, grammar, operator priorities and semantics.</li>
     <li><a href="mcp.html">The MCP server</a>: an AI that does not know Butterfly learns it, writes it and runs it, thanks to the server alone.</li>
-    <li><a href="compilateur.html">Under the hood</a>: the lexer, the parser, the analysis and the Python generation, step by step.</li>
+    <li><a href="internals.html">Under the hood</a>: the lexer, the parser, the analysis and the Python generation, step by step.</li>
   </ul>
 </section>
 
