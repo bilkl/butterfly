@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 260" role="img" aria-label="Reactive flow: source cells feed a derived cell which triggers an observer">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#8c9bff"/></marker>
+    <style>
+      .t{font-family:Inter,'Segoe UI',Helvetica,Arial,sans-serif;font-size:20px;fill:#e9ecff}
+      .s{font-family:'JetBrains Mono','Fira Code',Consolas,monospace;font-size:17px;fill:#aab4ff}
+      .k{font-family:Inter,'Segoe UI',Helvetica,Arial,sans-serif;font-size:15px;font-weight:700;letter-spacing:2px}
+    </style>
+  </defs>
+  <rect width="900" height="260" rx="16" fill="#0b0e24"/>
+  <rect x="40" y="40" width="200" height="70" rx="12" fill="#2a1d05" stroke="#f2a33a" stroke-width="2"/>
+  <text x="140" y="68" text-anchor="middle" class="k" fill="#f2a33a">LET</text>
+  <text x="140" y="94" text-anchor="middle" class="s">price = 20</text>
+  <rect x="40" y="150" width="200" height="70" rx="12" fill="#2a1d05" stroke="#f2a33a" stroke-width="2"/>
+  <text x="140" y="178" text-anchor="middle" class="k" fill="#f2a33a">LET</text>
+  <text x="140" y="204" text-anchor="middle" class="s">quantity = 3</text>
+  <rect x="320" y="95" width="290" height="70" rx="12" fill="#06262a" stroke="#2bd1c6" stroke-width="2"/>
+  <text x="465" y="123" text-anchor="middle" class="k" fill="#2bd1c6">BIND</text>
+  <text x="465" y="149" text-anchor="middle" class="s">total = price * quantity</text>
+  <rect x="680" y="95" width="190" height="70" rx="12" fill="#1c1240" stroke="#8c66f0" stroke-width="2"/>
+  <text x="775" y="123" text-anchor="middle" class="k" fill="#8c66f0">WHEN</text>
+  <text x="775" y="149" text-anchor="middle" class="s">print total</text>
+  <path d="M240 75L320 118" stroke="#8c9bff" stroke-width="2.5" fill="none" marker-end="url(#a)"/>
+  <path d="M240 185L320 142" stroke="#8c9bff" stroke-width="2.5" fill="none" marker-end="url(#a)"/>
+  <path d="M610 130L680 130" stroke="#8c9bff" stroke-width="2.5" fill="none" marker-end="url(#a)"/>
+</svg>

@@ -1,8 +1,23 @@
-# Butterfly
+<div align="center">
+
+<img src="assets/banner.svg" alt="Butterfly" width="100%">
+
+<br>
+
+![Python](https://img.shields.io/badge/Python-3.12+-0d6efd?style=for-the-badge&logo=python&logoColor=4DA6FF&labelColor=000000)
+![Tests](https://img.shields.io/badge/tests-419_passing-0d6efd?style=for-the-badge&logo=pytest&logoColor=4DA6FF&labelColor=000000)
+![mypy](https://img.shields.io/badge/mypy-strict-0d6efd?style=for-the-badge&logoColor=4DA6FF&labelColor=000000)
+![Ruff](https://img.shields.io/badge/lint-ruff-0d6efd?style=for-the-badge&logo=ruff&logoColor=4DA6FF&labelColor=000000)
+![MCP](https://img.shields.io/badge/MCP-server-0d6efd?style=for-the-badge&logoColor=4DA6FF&labelColor=000000)
+[![Website](https://img.shields.io/badge/website-EN%20%7C%20FR-0d6efd?style=for-the-badge&logo=githubpages&logoColor=4DA6FF&labelColor=000000)](https://xbkh.github.io/butterfly/)
+
+</div>
 
 A **reactive** programming language, transpiled to Python, with its MCP server.
 
 In Butterfly, you change a single value and everything that depends on it updates by itself: that is the butterfly effect.
+
+<p align="center"><img src="assets/reactive-flow.svg" alt="let, bind and when: source cells feed a derived cell that triggers an observer" width="85%"></p>
 
 ```
 let price = 20;
